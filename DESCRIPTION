@@ -91,10 +91,10 @@ Config/Needs/website:
     pkgdown
 SystemRequirements: pandoc
 VignetteBuilder: knitr
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Imports: 
     CDM,
     gtools,
     polycor,
     stringr
+Config/roxygen2/version: 8.0.0
