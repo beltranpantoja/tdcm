@@ -281,29 +281,29 @@
 #' Suppose item 1 measures Attributes 1 and 2, and item invariance is assumed across time points.
 #' The item response function for item 1 following the LCDM can be expressed as:
 #'
-#'\deqn{
+#' \deqn{
 #' \pi_{1c} = P(X_{1c} = 1|\alpha_{c}) = \frac{exp(\lambda_{1,0}+
 #' \lambda_{1,1(1)}\alpha_{c1} + \lambda_{1,1(2)}\alpha_{c2} + \lambda_{1,2(1,2)}\alpha_{c1}\alpha_{c2})}{1 + exp(\lambda_{1,0}+
 #' \lambda_{1,1(1)}\alpha_{c1} + \lambda_{1,1(2)}\alpha_{c2} + \lambda_{1,2(1,2)}\alpha_{c1}\alpha_{c2})},
-#'}
+#' }
 #'
 #' Then, the DINA model is obtained by constraining the LCDM main effects to zero, resulting in:
 #'
-#'\deqn{
+#' \deqn{
 #' \pi_{1c} = P(X_{1c} = 1|\alpha_{c}) = \frac{exp(\lambda_{1,0}+
 #' \lambda_{1,2(1,2)}\alpha_{c1}\alpha_{c2})}{1 + exp(\lambda_{1,0}+
 #' \lambda_{1,2(1,2)}\alpha_{c1}\alpha_{c2})}.
-#'}
+#' }
 #'
 #' #### DINO Model
 #'
 #' The DINO model is a compensatory DCM, meaning that examinees can correctly answer an item if they have mastered at least one of the attributes required by that item. Consequently, the main and interaction terms in the LCDM are constrained to be equal, and we subtract the interaction term to ensure the item response probability remains unchanged when multiple attributes are mastered. Following the previous example, the DINO model can be expressed as:
 #'
-#'\deqn{
+#' \deqn{
 #' \pi_{1c} = P(X_{1c} = 1|\alpha_{c}) = \frac{exp(\lambda_{1,0}+
 #' (\lambda_{1,1(1)}\alpha_{c1} + \lambda_{1,1(2)}\alpha_{c2} - \lambda_{1,2(1,2)}\alpha_{c1}\alpha_{c2}))}{1 + exp(\lambda_{1,0}+
 #' (\lambda_{1,1(1)}\alpha_{c1} + \lambda_{1,1(2)}\alpha_{c2} - \lambda_{1,2(1,2)}\alpha_{c1}\alpha_{c2}))}.
-#'}
+#' }
 #'
 #' #### CRUM Model
 #'
@@ -311,11 +311,11 @@
 #'
 #' Following the previous example, the CRUM model can be expressed as:
 #'
-#'\deqn{
+#' \deqn{
 #' \pi_{1c} = P(X_{1c} = 1|\alpha_{c}) = \frac{exp(\lambda_{1,0}+
 #' \lambda_{1,1(1)}\alpha_{c1} + \lambda_{1,1(2)}\alpha_{c2} )}{1 + exp(\lambda_{1,0}+
 #' \lambda_{1,1(1)}\alpha_{c1} + \lambda_{1,1(2)}\alpha_{c2} )}.
-#'}
+#' }
 #'
 #' ### Estimation Methods
 #'
@@ -329,493 +329,484 @@
 #' \donttest{
 #'
 #' ############################################################################
-#'# Example 1: TDCM with full measurement invariance
-#'############################################################################
+#' # Example 1: TDCM with full measurement invariance
+#' ############################################################################
 #'
-#'# Load dataset: T=2, A=4
-#'data(data.tdcm01, package = "TDCM")
-#'data <- data.tdcm01$data
-#'q.matrix <- data.tdcm01$q.matrix
-#'# Estimate model
-#'model1 <- TDCM::tdcm(data, q.matrix, num.time.points = 2, invariance = TRUE,
-#'                     rule = "LCDM", num.q.matrix = 1)
-#'# Summarize results with tdcm.summary().
-#'results <- TDCM::tdcm.summary(model1)
-#'results$item.parameters
-#'results$growth
-#'results$growth.effects
-#'results$transition.probabilities
+#' # Load dataset: T=2, A=4
+#' data(data.tdcm01, package = "TDCM")
+#' data <- data.tdcm01$data
+#' q.matrix <- data.tdcm01$q.matrix
+#' # Estimate model
+#' model1 <- TDCM::tdcm(data, q.matrix,
+#'   num.time.points = 2, invariance = TRUE,
+#'   rule = "LCDM", num.q.matrix = 1
+#' )
+#' # Summarize results with tdcm.summary().
+#' results <- TDCM::tdcm.summary(model1)
+#' results$item.parameters
+#' results$growth
+#' results$growth.effects
+#' results$transition.probabilities
 #'
-#'#############################################################################
-#'# Example 2: TDCM with no measurement invariance
-#'############################################################################
+#' #############################################################################
+#' # Example 2: TDCM with no measurement invariance
+#' ############################################################################
 #'
-#'# Load dataset: T=2, A=4
-#'data(data.tdcm01, package = "TDCM")
-#'data <- data.tdcm01$data
-#'q.matrix <- data.tdcm01$q.matrix
-#'# Estimate model
-#'model2 <- TDCM::tdcm(data, q.matrix, num.time.points = 2, invariance = FALSE,
-#'                     rule = "LCDM", num.q.matrix = 1)
-#'# Summarize results with tdcm.summary().
-#'results2 <- TDCM::tdcm.summary(model2)
-#'results2$item.parameters
-#'results2$growth
-#'results2$growth.effects
-#'results2$transition.probabilities
-#'
-#'
-#'#############################################################################
-#'# Example 3: TDCM with different Q-matrices for each time point and no
-#'# anchor items
-#'############################################################################
-#'
-#'# Load dataset: T=3, A=2
-#'data(data.tdcm03, package = "TDCM")
-#'data <- data.tdcm03$data
-#'q1 <- data.tdcm03$q.matrix.1
-#'q2 <- data.tdcm03$q.matrix.2
-#'q3 <- data.tdcm03$q.matrix.3
-#'q <- data.tdcm03$q.matrix.stacked
-#'
-#'# Estimate model
-#'model3 <- TDCM::tdcm(data, q, num.time.points = 3, rule = "LCDM",
-#'                     num.q.matrix = 3, num.items = c(10, 10, 10))
-#'
-#'#----------------------------------------------------------------------------
-#'# Summarize results with tdcm.summary() for more than 2 time points.
-#'#----------------------------------------------------------------------------
-#'
-#'## There are three post hoc approaches to summarize the transition probabilities
-#'## for each attribute across time using the tdcm.summary() function.
-#'## Each of them is illustrated below.
-#'
-#'## 1. When the transition.option argument in the tdcm.summary() is not specified,
-#'## the function assumes by default that transition.option = 1.
-#'## Thus, when summarizing the transition probabilities
-#'## you will compare the results for the first and last time point.
-#'
-#'### Summary with default option
-#'
-#'results3_def_transition <- TDCM::tdcm.summary(model3)
-#'results3_def_transition$transition.probabilities
-#'#, , Attribute 1: Time 1 to Time 3
-#'#
-#'#       T3 [0] T3 [1]
-#'#T1 [0]  0.202  0.798
-#'#T1 [1]  0.146  0.854
-#'#
-#'#, , Attribute 2: Time 1 to Time 3
-#'#
-#'#       T3 [0] T3 [1]
-#'#T1 [0]  0.325  0.675
-#'#T1 [1]  0.257  0.743
-#'
-#'## 2. When the transition.option = 2, you can compare the transition probabilities
-#'## from the first time point to every other time point. In this case, you can
-#'## compare the transition probabilities between Time Point 1 and Time Point 2,
-#'## and Time Point 1 with Time Point 3.
-#'
-#'### Summary with transition.option = 2
-#'results3_2transition <- TDCM::tdcm.summary(model3, transition.option = 2)
-#'results3_2transition$transition.probabilities
-#'#, , Attribute 1: Time 1 to Time 2
-#'#
-#'#.    [0]   [1]
-#'#[0] 0.510 0.490
-#'#[1] 0.424 0.576
-#'#
-#'#, , Attribute 2: Time 1 to Time 2
-#'#
-#'#     [0]   [1]
-#'#[0] 0.456 0.544
-#'#[1] 0.334 0.666
-#'#
-#'#, , Attribute 1: Time 1 to Time 3
-#'#
-#'#     [0]   [1]
-#'#[0] 0.202 0.798
-#'#[1] 0.146 0.854
-#'#
-#'#, , Attribute 2: Time 1 to Time 3
-#'#
-#'#     [0]   [1]
-#'#[0] 0.325 0.675
-#'#[1] 0.257 0.743
-#'
-#'## 3. When the transition.option = 3, you can compare the transition probabilities
-#'## sequentially, such that for each attribute, you can compare the transition
-#'## probabilities between Time Point 1 and Time Point 2, Time Point 2 and Time Point 3
-#'
-#'### Summary with transition.option = 3
-#'results3_3transition <- TDCM::tdcm.summary(model3, transition.option = 3)
-#'results3_3transition$transition.probabilities
-#'#, , Attribute 1: Time 1 to Time 2
-#'#
-#'#    [0]   [1]
-#'#[0] 0.510 0.490
-#'#[1] 0.424 0.576
-#'#
-#'#, , Attribute 2: Time 1 to Time 2
-#'#
-#'#     [0]   [1]
-#'#[0] 0.456 0.544
-#'#[1] 0.334 0.666
-#'#
-#'#, , Attribute 1: Time 2 to Time 3
-#'#
-#'#     [0]   [1]
-#'#[0] 0.183 0.817
-#'#[1] 0.188 0.812
-#'#
-#'#, , Attribute 2: Time 2 to Time 3
-#'#
-#'#     [0]   [1]
-#'#[0] 0.361 0.639
-#'#[1] 0.262 0.738
-#'
-#'#############################################################################
-#'# Example 4: Full TDCM with different Q-matrices for each time point and
-#'# anchor items
-#'############################################################################
-#'
-#'# Load dataset: T=3, A=2
-#'data <- data.tdcm03$data
-#'q1 <- data.tdcm03$q.matrix.1
-#'q2 <- data.tdcm03$q.matrix.2
-#'q3 <- data.tdcm03$q.matrix.3
-#'q <- data.tdcm03$q.matrix.stacked
-#'## Estimate model
-#'## Anchor items:
-#'## - item 1, item 11, and item 21 are the same
-#'## - item 14 and item 24 are the same.
-#'
-#'model4 <- TDCM::tdcm(data, q, num.time.points = 3, rule = "LCDM",
-#'                     num.q.matrix = 3, anchor = c(1,11,
-#'                                                  1,21,
-#'                                                  14,24),
-#'                     num.items = c(10, 10, 10))
-#'
-#'# Summarize results with tdcm.summary().
-#'results4 <- TDCM::tdcm.summary(model4)
-#'results4$item.parameters
-#'results4$growth
-#'results4$growth.effects
-#'results4$transition.probabilities
-#'
-#'#----------------------------------------------------------------------------
-#'#Compare models from example 3 and 4 to assess measurement invariance
-#'#----------------------------------------------------------------------------
-#'
-#'## Additionally, we can measure the measurement invariance between a TDCM model
-#'## that assumes full measurement invariance (model3) and a model that assumes partial
-#'## measurement invariance (model4)
-#'
-#'model_comparison <- tdcm.compare(model3, model4)
+#' # Load dataset: T=2, A=4
+#' data(data.tdcm01, package = "TDCM")
+#' data <- data.tdcm01$data
+#' q.matrix <- data.tdcm01$q.matrix
+#' # Estimate model
+#' model2 <- TDCM::tdcm(data, q.matrix,
+#'   num.time.points = 2, invariance = FALSE,
+#'   rule = "LCDM", num.q.matrix = 1
+#' )
+#' # Summarize results with tdcm.summary().
+#' results2 <- TDCM::tdcm.summary(model2)
+#' results2$item.parameters
+#' results2$growth
+#' results2$growth.effects
+#' results2$transition.probabilities
 #'
 #'
-#'#############################################################################
-#'# Example 5: DINA TDCM with full measurement invariance
-#'############################################################################
+#' #############################################################################
+#' # Example 3: TDCM with different Q-matrices for each time point and no
+#' # anchor items
+#' ############################################################################
 #'
-#'# Load dataset: T=2, A=4
-#'data(data.tdcm01, package = "TDCM")
-#'data <- data.tdcm01$data
-#'q.matrix <- data.tdcm01$q.matrix
+#' # Load dataset: T=3, A=2
+#' data(data.tdcm03, package = "TDCM")
+#' data <- data.tdcm03$data
+#' q1 <- data.tdcm03$q.matrix.1
+#' q2 <- data.tdcm03$q.matrix.2
+#' q3 <- data.tdcm03$q.matrix.3
+#' q <- data.tdcm03$q.matrix.stacked
 #'
-#'# Estimate model
-#'model5 <- TDCM::tdcm(data, q.matrix, num.time.points = 2, invariance = TRUE,
-#'                     rule = "DINA", num.q.matrix = 1)
-#'# Summarize results with tdcm.summary().
-#'results5 <- TDCM::tdcm.summary(model5)
-#'results5$item.parameters
-#'results5$growth
-#'results5$growth.effects
-#'results5$transition.probabilities
+#' # Estimate model
+#' model3 <- TDCM::tdcm(data, q,
+#'   num.time.points = 3, rule = "LCDM",
+#'   num.q.matrix = 3, num.items = c(10, 10, 10)
+#' )
 #'
-#'#############################################################################
-#'# Example 6: DINO TDCM with full measurement invariance
-#'############################################################################
+#' #----------------------------------------------------------------------------
+#' # Summarize results with tdcm.summary() for more than 2 time points.
+#' #----------------------------------------------------------------------------
 #'
-#'# Load dataset: T=2, A=4
-#'data(data.tdcm01, package = "TDCM")
-#'data <- data.tdcm01$data
-#'q.matrix <- data.tdcm01$q.matrix
+#' ## There are three post hoc approaches to summarize the transition probabilities
+#' ## for each attribute across time using the tdcm.summary() function.
+#' ## Each of them is illustrated below.
 #'
-#'# Estimate model
-#'model6 <- TDCM::tdcm(data, q.matrix, num.time.points = 2, invariance = TRUE,
-#'                     rule = "DINO", num.q.matrix = 1)
-#'# Summarize results with tdcm.summary().
-#'results6 <- TDCM::tdcm.summary(model6)
-#'results6$item.parameters
-#'results6$growth
-#'results6$growth.effects
-#'results6$transition.probabilities
+#' ## 1. When the transition.option argument in the tdcm.summary() is not specified,
+#' ## the function assumes by default that transition.option = 1.
+#' ## Thus, when summarizing the transition probabilities
+#' ## you will compare the results for the first and last time point.
 #'
-#'#############################################################################
-#'# Example 7: CRUM TDCM with full measurement invariance
-#'############################################################################
+#' ### Summary with default option
 #'
-#'# Load dataset: T=2, A=4
-#'data(data.tdcm01, package = "TDCM")
-#'data <- data.tdcm01$data
-#'q.matrix <- data.tdcm01$q.matrix
+#' results3_def_transition <- TDCM::tdcm.summary(model3)
+#' results3_def_transition$transition.probabilities
+#' # , , Attribute 1: Time 1 to Time 3
+#' #
+#' #       T3 [0] T3 [1]
+#' # T1 [0]  0.202  0.798
+#' # T1 [1]  0.146  0.854
+#' #
+#' # , , Attribute 2: Time 1 to Time 3
+#' #
+#' #       T3 [0] T3 [1]
+#' # T1 [0]  0.325  0.675
+#' # T1 [1]  0.257  0.743
 #'
-#'# Estimate model
-#'model7 <- TDCM::tdcm(data, q.matrix, num.time.points = 2, invariance = TRUE,
-#'                     rule = "CRUM", num.q.matrix = 1)
-#'# Summarize results with tdcm.summary().
-#'results7 <- TDCM::tdcm.summary(model7)
-#'results7$item.parameters
-#'results7$growth
-#'results7$growth.effects
-#'results7$transition.probabilities
+#' ## 2. When the transition.option = 2, you can compare the transition probabilities
+#' ## from the first time point to every other time point. In this case, you can
+#' ## compare the transition probabilities between Time Point 1 and Time Point 2,
+#' ## and Time Point 1 with Time Point 3.
 #'
-#'#############################################################################
-#'# Example 8: RRUM TDCM with full measurement invariance
-#'############################################################################
+#' ### Summary with transition.option = 2
+#' results3_2transition <- TDCM::tdcm.summary(model3, transition.option = 2)
+#' results3_2transition$transition.probabilities
+#' # , , Attribute 1: Time 1 to Time 2
+#' #
+#' # .    [0]   [1]
+#' # [0] 0.510 0.490
+#' # [1] 0.424 0.576
+#' #
+#' # , , Attribute 2: Time 1 to Time 2
+#' #
+#' #     [0]   [1]
+#' # [0] 0.456 0.544
+#' # [1] 0.334 0.666
+#' #
+#' # , , Attribute 1: Time 1 to Time 3
+#' #
+#' #     [0]   [1]
+#' # [0] 0.202 0.798
+#' # [1] 0.146 0.854
+#' #
+#' # , , Attribute 2: Time 1 to Time 3
+#' #
+#' #     [0]   [1]
+#' # [0] 0.325 0.675
+#' # [1] 0.257 0.743
 #'
-#'# Load dataset: T=2, A=4
-#'data(data.tdcm01, package = "TDCM")
-#'data <- data.tdcm01$data
-#'q.matrix <- data.tdcm01$q.matrix
+#' ## 3. When the transition.option = 3, you can compare the transition probabilities
+#' ## sequentially, such that for each attribute, you can compare the transition
+#' ## probabilities between Time Point 1 and Time Point 2, Time Point 2 and Time Point 3
 #'
-#'# Estimate model
-#'model8 <- TDCM::tdcm(data, q.matrix, num.time.points = 2, invariance = TRUE,
-#'                     rule = "RRUM", num.q.matrix = 1)
-#'# Summarize results with tdcm.summary().
-#'results8 <- TDCM::tdcm.summary(model8)
-#'results8$item.parameters
-#'results8$growth
-#'results8$growth.effects
-#'results8$transition.probabilities
+#' ### Summary with transition.option = 3
+#' results3_3transition <- TDCM::tdcm.summary(model3, transition.option = 3)
+#' results3_3transition$transition.probabilities
+#' # , , Attribute 1: Time 1 to Time 2
+#' #
+#' #    [0]   [1]
+#' # [0] 0.510 0.490
+#' # [1] 0.424 0.576
+#' #
+#' # , , Attribute 2: Time 1 to Time 2
+#' #
+#' #     [0]   [1]
+#' # [0] 0.456 0.544
+#' # [1] 0.334 0.666
+#' #
+#' # , , Attribute 1: Time 2 to Time 3
+#' #
+#' #     [0]   [1]
+#' # [0] 0.183 0.817
+#' # [1] 0.188 0.812
+#' #
+#' # , , Attribute 2: Time 2 to Time 3
+#' #
+#' #     [0]   [1]
+#' # [0] 0.361 0.639
+#' # [1] 0.262 0.738
 #'
+#' #############################################################################
+#' # Example 4: Full TDCM with different Q-matrices for each time point and
+#' # anchor items
+#' ############################################################################
+#'
+#' # Load dataset: T=3, A=2
+#' data <- data.tdcm03$data
+#' q1 <- data.tdcm03$q.matrix.1
+#' q2 <- data.tdcm03$q.matrix.2
+#' q3 <- data.tdcm03$q.matrix.3
+#' q <- data.tdcm03$q.matrix.stacked
+#' ## Estimate model
+#' ## Anchor items:
+#' ## - item 1, item 11, and item 21 are the same
+#' ## - item 14 and item 24 are the same.
+#'
+#' model4 <- TDCM::tdcm(data, q,
+#'   num.time.points = 3, rule = "LCDM",
+#'   num.q.matrix = 3, anchor = c(
+#'     1, 11,
+#'     1, 21,
+#'     14, 24
+#'   ),
+#'   num.items = c(10, 10, 10)
+#' )
+#'
+#' # Summarize results with tdcm.summary().
+#' results4 <- TDCM::tdcm.summary(model4)
+#' results4$item.parameters
+#' results4$growth
+#' results4$growth.effects
+#' results4$transition.probabilities
+#'
+#' #----------------------------------------------------------------------------
+#' # Compare models from example 3 and 4 to assess measurement invariance
+#' #----------------------------------------------------------------------------
+#'
+#' ## Additionally, we can measure the measurement invariance between a TDCM model
+#' ## that assumes full measurement invariance (model3) and a model that assumes partial
+#' ## measurement invariance (model4)
+#'
+#' model_comparison <- tdcm.compare(model3, model4)
+#'
+#'
+#' #############################################################################
+#' # Example 5: DINA TDCM with full measurement invariance
+#' ############################################################################
+#'
+#' # Load dataset: T=2, A=4
+#' data(data.tdcm01, package = "TDCM")
+#' data <- data.tdcm01$data
+#' q.matrix <- data.tdcm01$q.matrix
+#'
+#' # Estimate model
+#' model5 <- TDCM::tdcm(data, q.matrix,
+#'   num.time.points = 2, invariance = TRUE,
+#'   rule = "DINA", num.q.matrix = 1
+#' )
+#' # Summarize results with tdcm.summary().
+#' results5 <- TDCM::tdcm.summary(model5)
+#' results5$item.parameters
+#' results5$growth
+#' results5$growth.effects
+#' results5$transition.probabilities
+#'
+#' #############################################################################
+#' # Example 6: DINO TDCM with full measurement invariance
+#' ############################################################################
+#'
+#' # Load dataset: T=2, A=4
+#' data(data.tdcm01, package = "TDCM")
+#' data <- data.tdcm01$data
+#' q.matrix <- data.tdcm01$q.matrix
+#'
+#' # Estimate model
+#' model6 <- TDCM::tdcm(data, q.matrix,
+#'   num.time.points = 2, invariance = TRUE,
+#'   rule = "DINO", num.q.matrix = 1
+#' )
+#' # Summarize results with tdcm.summary().
+#' results6 <- TDCM::tdcm.summary(model6)
+#' results6$item.parameters
+#' results6$growth
+#' results6$growth.effects
+#' results6$transition.probabilities
+#'
+#' #############################################################################
+#' # Example 7: CRUM TDCM with full measurement invariance
+#' ############################################################################
+#'
+#' # Load dataset: T=2, A=4
+#' data(data.tdcm01, package = "TDCM")
+#' data <- data.tdcm01$data
+#' q.matrix <- data.tdcm01$q.matrix
+#'
+#' # Estimate model
+#' model7 <- TDCM::tdcm(data, q.matrix,
+#'   num.time.points = 2, invariance = TRUE,
+#'   rule = "CRUM", num.q.matrix = 1
+#' )
+#' # Summarize results with tdcm.summary().
+#' results7 <- TDCM::tdcm.summary(model7)
+#' results7$item.parameters
+#' results7$growth
+#' results7$growth.effects
+#' results7$transition.probabilities
+#'
+#' #############################################################################
+#' # Example 8: RRUM TDCM with full measurement invariance
+#' ############################################################################
+#'
+#' # Load dataset: T=2, A=4
+#' data(data.tdcm01, package = "TDCM")
+#' data <- data.tdcm01$data
+#' q.matrix <- data.tdcm01$q.matrix
+#'
+#' # Estimate model
+#' model8 <- TDCM::tdcm(data, q.matrix,
+#'   num.time.points = 2, invariance = TRUE,
+#'   rule = "RRUM", num.q.matrix = 1
+#' )
+#' # Summarize results with tdcm.summary().
+#' results8 <- TDCM::tdcm.summary(model8)
+#' results8$item.parameters
+#' results8$growth
+#' results8$growth.effects
+#' results8$transition.probabilities
+#' }
 
-#'#############################################################################
-#'# Example 9: TDCM with and without forgetting
-#'############################################################################
+#' #############################################################################
+#' # Example 9: TDCM with and without forgetting
+#' ############################################################################
 #'
-#'# Load dataset: T=2, A=4,
-#'data(data.tdcm01, package = "TDCM")
-#'data <- data.tdcm01$data
-#'q.matrix <- data.tdcm01$q.matrix
+#' # Load dataset: T=2, A=4,
+#' data(data.tdcm01, package = "TDCM")
+#' data <- data.tdcm01$data
+#' q.matrix <- data.tdcm01$q.matrix
 #'
-#'##----------------------------------------------------------------------------
-#'# With forgetting
-#'#----------------------------------------------------------------------------
-#'## Consider a default model in which students can retain or lose their mastery status
-#'## from one time point to another
+#' ##----------------------------------------------------------------------------
+#' # With forgetting
+#' #----------------------------------------------------------------------------
+#' ## Consider a default model in which students can retain or lose their mastery status
+#' ## from one time point to another
 #'
-#'# Estimate the model
-#'model11_forgetting <- TDCM::tdcm(data, q.matrix, num.time.points = 2, invariance = TRUE,
+#' # Estimate the model
+#' model11_forgetting <- TDCM::tdcm(data, q.matrix, num.time.points = 2, invariance = TRUE,
 #'                                 rule = "LCDM", num.q.matrix = 1)
 #'
-#'# Summarize results with tdcm.summary().
-#'results_forgetting <- TDCM::tdcm.summary(model11_forgetting, transition.option = 3)
-#'results_forgetting$transition.probabilities
+#' # Summarize results with tdcm.summary().
+#' results_forgetting <- TDCM::tdcm.summary(model11_forgetting, transition.option = 3)
+#' results_forgetting$transition.probabilities
 #'
-#'#, , Attribute 1: Time 1 to Time 2
-#'#
-#'#     [0]   [1]
-#'#[0] 0.680 0.320
-#'#[1] 0.417 0.583
-#'#
-#'#, , Attribute 2: Time 1 to Time 2
-#'#
-#'#     [0]   [1]
-#'#[0] 0.581 0.419
-#'#[1] 0.353 0.647
-#'#
-#'#, , Attribute 3: Time 1 to Time 2
-#'#
-#'#     [0]   [1]
-#'#[0] 0.549 0.451
-#'#[1] 0.221 0.779
-#'#
-#'#, , Attribute 4: Time 1 to Time 2
-#'#
-#'#     [0]   [1]
-#'#[0] 0.371 0.629
-#'#[1] 0.104 0.896
+#' #, , Attribute 1: Time 1 to Time 2
+#' #
+#' #     [0]   [1]
+#' #[0] 0.680 0.320
+#' #[1] 0.417 0.583
+#' #
+#' #, , Attribute 2: Time 1 to Time 2
+#' #
+#' #     [0]   [1]
+#' #[0] 0.581 0.419
+#' #[1] 0.353 0.647
+#' #
+#' #, , Attribute 3: Time 1 to Time 2
+#' #
+#' #     [0]   [1]
+#' #[0] 0.549 0.451
+#' #[1] 0.221 0.779
+#' #
+#' #, , Attribute 4: Time 1 to Time 2
+#' #
+#' #     [0]   [1]
+#' #[0] 0.371 0.629
+#' #[1] 0.104 0.896
 #'
-#'##----------------------------------------------------------------------------
-#'# Without forgetting
-#'#----------------------------------------------------------------------------
-#'## Consider a model in which students cannot lose their mastery status for Attribute 4
-#'## from one time point to another.
+#' ##----------------------------------------------------------------------------
+#' # Without forgetting
+#' #----------------------------------------------------------------------------
+#' ## Consider a model in which students cannot lose their mastery status for Attribute 4
+#' ## from one time point to another.
 #'
-#'# Estimate the model
-#'model11_noforgetting <- TDCM::tdcm(data, q.matrix, num.time.points = 2, invariance = TRUE,
+#' # Estimate the model
+#' model11_noforgetting <- TDCM::tdcm(data, q.matrix, num.time.points = 2, invariance = TRUE,
 #'                                   rule = "LCDM", num.q.matrix = 1, forget.att = c(4))
 #'
-#'# Summarize results with tdcm.summary().
-#'results_noforgetting <- TDCM::tdcm.summary(model11_noforgetting, transition.option = 3)
-#'results_noforgetting$transition.probabilities
+#' # Summarize results with tdcm.summary().
+#' results_noforgetting <- TDCM::tdcm.summary(model11_noforgetting, transition.option = 3)
+#' results_noforgetting$transition.probabilities
 #'
-#'#, , Attribute 1: Time 1 to Time 2
-#'#
-#'#     [0]   [1]
-#'#[0] 0.678 0.322
-#'#[1] 0.416 0.584
-#'#
-#'#, , Attribute 2: Time 1 to Time 2
-#'#
-#'#     [0]   [1]
-#'#[0] 0.578 0.422
-#'#[1] 0.359 0.641
-#'#
-#'#, , Attribute 3: Time 1 to Time 2
-#'#
-#'#     [0]   [1]
-#'#[0] 0.546 0.454
-#'#[1] 0.226 0.774
-#'#
-#'#, , Attribute 4: Time 1 to Time 2
-#'#
-#'#      [0]   [1]
-#'#[0] 0.382 0.618
-#'#[1] 0.000 1.000
+#' #, , Attribute 1: Time 1 to Time 2
+#' #
+#' #     [0]   [1]
+#' #[0] 0.678 0.322
+#' #[1] 0.416 0.584
+#' #
+#' #, , Attribute 2: Time 1 to Time 2
+#' #
+#' #     [0]   [1]
+#' #[0] 0.578 0.422
+#' #[1] 0.359 0.641
+#' #
+#' #, , Attribute 3: Time 1 to Time 2
+#' #
+#' #     [0]   [1]
+#' #[0] 0.546 0.454
+#' #[1] 0.226 0.774
+#' #
+#' #, , Attribute 4: Time 1 to Time 2
+#' #
+#' #      [0]   [1]
+#' #[0] 0.382 0.618
+#' #[1] 0.000 1.000
 #'
 #' }
 #' @export
 tdcm <- function(
-    data,
-    q.matrix,
-    num.time.points,
-    invariance = TRUE,
-    rule = "LCDM",
-    linkfct = "logit",
-    num.q.matrix = 1,
-    num.items = c(),
-    anchor = c(),
-    forget.att = c(),
-    progress = TRUE
+  data,
+  q.matrix,
+  num.time.points,
+  invariance = TRUE,
+  rule = "LCDM",
+  linkfct = "logit",
+  num.q.matrix = 1,
+  num.items = c(),
+  anchor = NULL,
+  forget.att = c(),
+  progress = TRUE
 ) {
+  # Printing messages
+  if (progress) {
+    print("Preparing data for tdcm()...",
+      quote = FALSE
+    )
+    print("Estimating the TDCM in tdcm()...",
+      quote = FALSE
+    )
+    print("Depending on model complexity, estimation time may vary...",
+      quote = FALSE
+    )
+  }
+
 
   # translate rule argument
   rule <- tdcm.rule.as.cdm.rule(rule)
 
-  if (num.q.matrix == 1) {
 
-    if (progress) {
-      print("Preparing data for tdcm()...", quote = FALSE)
-    } # if
-
-
-    # Initial Data Sorting
-    n.items <- ncol(data) # Total Items
-    items <- n.items / num.time.points # Items per time point
-    N <- nrow(data) # Number of Examinees
-    n.att <- ncol(q.matrix) # Number of Attributes
-
-    # give names to items
-    colnames(data) <- paste("Item", 1:n.items)
-    rownames(q.matrix) <- paste("Item", 1:items)
-
-    # build stacked Q-matrix
-    qnew <- matrix(0, ncol = n.att * num.time.points, nrow = n.items)
-    for (z in 1:num.time.points) {
-      for (i in 1:items) {
-        for (j in 1:n.att) {
-          qnew[i + ((z - 1) * items), j + ((z - 1) * n.att)] <- q.matrix[i, j]
-        } # for
-      } # for
-    } # for
+  # ===========================================================================
+  # TODO: PARAMETERS VALIDATION.
+  # e.g. consistency of num.q.matrix, num.items and q.matrix dimension
+  # the anchors should be from different matrices
+  # If invariance is TRUE then there shouldn't be multiple qmatrices.
+  # ===========================================================================
 
 
-    if (progress) {
-      print("Estimating the TDCM in tdcm()...", quote = FALSE)
-      print("Depending on model complexity, estimation time may vary...", quote = FALSE)
-    } # if
+  # ===========================================================================
+  # SETTING LIST OF QMATRICES
+  # Note: this will help later make it possible to pass the list directly which
+  # can save redundant arguments.
+  # ===========================================================================
 
-    #if user constraints forgetting
-    if(length(forget.att != 0)){
+  # First we create the list of Q-matrices
+  if (num.q.matrix == 1) { # The same Q-matrix repeated every time
 
-      #reduce the skill space
-      m0 <- tdcm.base(data, qnew, rule)
-      full.space = m0$attribute.patt.splitted
+    # We need to replicate the Q-matrix by the number of points
+    matrix_list <- replicate(
+      num.time.points,
+      q.matrix,
+      simplify = FALSE
+    )
+  } else { # Several Q-matrices, one per time
 
-      forget = c()
-      for(i in forget.att){
-
-        rows = which(full.space[,i] > full.space[,i+n.att])
-        forget = append(forget, rows)
-
-      }
-
-      forget = unique(forget)
-      red.space = full.space[-forget,]
-
-    } else{#full skill space
-
-      m0 <- tdcm.base(data, qnew, rule)
-      red.space = m0$attribute.patt.splitted
-
+    # We check that the arguments are correctly specified
+    if (num.q.matrix != length(num.items)) {
+      stop("You need to specify the number of items of each Q-matrix")
     }
 
 
-    if (invariance == FALSE) {
-      # If NOT invariant ~ no design matrix
-      tdcm <- suppressWarnings(CDM::gdina(
-        data,
-        qnew,
-        linkfct = linkfct,
-        method = "ML",
-        rule = rule,
-        skillclasses = red.space,
-        reduced.skillspace=FALSE,
-        progress = FALSE
-      )) # tdcm
-      tdcm$invariance <- FALSE
-    } else {
-      # if invariance = T, then constrain item parameters in design matrix
-      tdcm.1 <- tdcm.base(data, qnew, rule)
-      c0 <- tdcm.1$coef
-      c.0 <- nrow(c0)
-      designmatrix <- diag(nrow = c.0 / num.time.points, ncol = c.0 / num.time.points)
-      delta.designmatrix <- matrix(rep(t(designmatrix), num.time.points), ncol = ncol(designmatrix), byrow = TRUE)
-      tdcm <- suppressWarnings(CDM::gdina(
-        data,
-        qnew,
-        linkfct = linkfct,
-        method = "ML",
-        progress = FALSE,
-        delta.designmatrix = delta.designmatrix,
-        skillclasses = red.space,
-        rule = rule,
-        reduced.skillspace=FALSE
-      )) # tdcm
-    } # if
-  } else { # multiple Q-matrices
-    tdcm <- tdcm.mq(
-      data = data,
-      q.matrix = q.matrix,
-      num.time.points = num.time.points,
-      invariance = FALSE,
-      rule = rule,
-      linkfct = linkfct,
-      num.q.matrix = num.q.matrix,
-      num.items = num.items,
-      forget.att = c(),
-      anchor = anchor,
-      progress = progress
-    ) # tdcm
-  } # if
+    # We split the q.matrix into the sub q.matrices
+    groups <- rep(seq_along(num.items), times = num.items)
+    row_indices <- split(seq_len(nrow(q.matrix)), groups)
 
-  # set progress value in result object
+    matrix_list <- lapply(
+      row_indices,
+      function(idx) q.matrix[idx, , drop = FALSE]
+    )
+  }
+
+  # ===========================================================================
+  # Now we pass the multiple matrices to the `tdcm.mq`
+  # ===========================================================================
+
+  tdcm <- tdcm.mq(
+    data = data,
+    q.matrix = q.matrix,
+    num.time.points = num.time.points,
+    invariance = FALSE,
+    rule = rule,
+    linkfct = linkfct,
+    num.q.matrix = num.q.matrix,
+    num.items = num.items,
+    forget.att = c(),
+    anchor = anchor,
+    progress = progress
+  )
+
+  # ===========================================================================
+  # We set the call parameters in the object
+  # ===========================================================================
+
+
   tdcm$progress <- progress
-
-  # save number of time points
   tdcm$numtimepoints <- num.time.points
-
-  # save qmatrix
   tdcm$qt.matrix <- q.matrix
+
+  tdcm$invariance <- FALSE
+
+  # TODO: I am not completely sure if having anchors count as being invariant
+  if (any(!is.null(anchor), invariance)) {
+    tdcm$invariance <- TRUE
+  }
+
 
   if (progress) {
     print("TDCM estimation complete.", quote = FALSE)
     print("Use tdcm.summary() to display results.", quote = FALSE)
-  } # if
+  }
 
   return(tdcm)
-
 } # tdcm

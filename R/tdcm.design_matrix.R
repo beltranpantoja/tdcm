@@ -7,6 +7,8 @@
 #' @param qmatrix_list a list of \eqn{I \times A} matrices indicating which
 #'  items measure which attributes. This function assumes that if there's a
 #'  single qmatrix it was already.
+#'  @param invariance logical. If `TRUE` then item parameters will be
+#'    constrained to be equal at each time point.
 #' @param anchors a list of items to be anchored. They should be given as pairs.
 #'  (e.g. `c(1,11,3,15)` would imply that items 1 and 11 are the same and 3 and
 #'  3 and 15 too).
@@ -19,6 +21,7 @@
 #' @noRd
 design_matrix_TDCM <- function(
   qmatrix_list,
+  invariance = TRUE,
   anchors = NULL,
   rule = "GDINA"
 ) {
@@ -29,6 +32,26 @@ design_matrix_TDCM <- function(
       create_base_design_matrix(qmat, rule)
     }
   )
+
+
+  # ======================================================
+  # INVARIANCE LOGIC
+  # if invariant it basically means all items are anchors
+  # so the easiest way is to just bind the design matrices
+  # (this assumes the qmatrices in the list are all the same)
+  # ======================================================
+
+  if (invariance == TRUE) {
+    design_matrix <- do.call(rbind, design_matrices)
+
+    # Early return
+    return(design_matrix)
+  }
+
+  # ======================================================
+  # If not invariant, we need to collate them diagonally
+  # ======================================================
+
 
   # Then we join it into a single design matrix
   design_matrix <- Matrix::.bdiag(design_matrices)

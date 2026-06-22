@@ -31,6 +31,7 @@
 #' # calibrate 1-PLCDM
 #' m2 <- TDCM::oneplcdm(dat5, qmat5)
 #' summary(m2)
+#' }
 
 #' #demonstrate 1-PLCDM sum score sufficiency for each attribute
 #' subscores <- cbind(rowSums(dat5[, 1:5]), rowSums(dat5[, 6:10]),
@@ -80,67 +81,32 @@
 
 oneplcdm <- function(data, q.matrix, progress = TRUE) { # open function
 
-  # check q.matrix simple
-  s <- rowSums(q.matrix)
-  if (sum(s) == nrow(q.matrix)) { # open if q.matrix is simple
+  # This creates the 1PLCDM Q-matrix
+  design_matrix <- design_matrix_1plcdm(q.matrix)
 
-    # print line
-    if (progress == TRUE) {
-      print("Estimating 1-PLCDM...", quote = FALSE)
-    }
 
-    # estimate full lcdm
-    m1 <- CDM::gdina(data, q.matrix, linkfct = "logit", method = "ML", progress = FALSE, maxit = 1)
-
-    # how many items and attributes
-    I <- nrow(q.matrix)
-    num.atts <- ncol(q.matrix)
-
-    if (num.atts == 1) { # open single attribute case
-      c0 <- m1$coef
-      dd <- diag(nrow(c0))
-      dd[seq(4, 2 * I, by = 2), 2] <- 1
-      dd[, seq(4, 2 * I, by = 2)] <- 0
-      dd <- dd[, -seq(4, 2 * I, by = 2)]
-      m2 <- CDM::gdina(data, q.matrix, linkfct = "logit", method = "ML", progress = FALSE, delta.designmatrix = dd)
-
-      if (progress == TRUE) {
-        print("Estimation is complete. Use the CDM summary function to display results.", quote = FALSE)
-      }
-    } # end single attribute
-
-    if (num.atts > 1) { # open multiattribute case
-      c0 <- m1$coef
-      delta.designmatrix <- matrix(0, nrow = nrow(c0), ncol = nrow(c0))
-      diag(delta.designmatrix) <- 1
-      all <- c()
-      for (i in 1:num.atts) {
-        x <- (which(q.matrix[, i] == 1)) * 2
-        y <- x[1]
-        x <- x[-1]
-        delta.designmatrix[x, y] <- 1
-        delta.designmatrix[, x] <- 0
-        all <- append(all, x)
-      }
-      all <- sort(all)
-      delta.designmatrix <- delta.designmatrix[, -all]
-
-      m2 <- CDM::gdina(data, q.matrix,
-                  linkfct = "logit", method = "ML",
-                  delta.designmatrix = delta.designmatrix, HOGDINA = 0,
-                  progress = FALSE)
-
-      if (progress == TRUE) {
-        print("Estimation is complete. Use the CDM summary function to display results.", quote = FALSE)
-      }
-    } # end single attribute
-
-    return(m2)
-  } # close if not simple Q-matrix
-
-  else {
-    stop("Q-matrix has complex items. The 1-PLCDM can only be employed for single attribute assessment or
-         for a multi-attribute assessment with a simple structure Q-matrix.")
+  if (progress == TRUE) {
+    print("Estimating 1-PLCDM...", quote = FALSE)
   }
 
+  # We call gdina using the created design matrix
+  oneplcdm_mod <- CDM::gdina(
+    data,
+    q.matrix,
+    linkfct = "logit",
+    method = "ML",
+    delta.designmatrix = delta.designmatrix,
+    HOGDINA = 0,
+    progress = FALSE
+  )
+
+  if (progress == TRUE) {
+    print(
+      "Estimation is complete. Use the CDM summary function to display results.",
+      quote = FALSE
+    )
+  }
+
+  # Return
+  oneplcdm_mod
 } # close function
