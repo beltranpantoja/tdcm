@@ -89,21 +89,23 @@ oneplcdm <- function(data, q.matrix, progress = TRUE) { # open function
     print("Estimating 1-PLCDM...", quote = FALSE)
   }
 
+  # A trick to pass the proper hogdina value to the gdina function.
+  hogdina_value <- if (ncol(q.matrix) == 1) -1 else 0
+
   # We call gdina using the created design matrix
   oneplcdm_mod <- CDM::gdina(
     data,
     q.matrix,
     linkfct = "logit",
     method = "ML",
-    delta.designmatrix = delta.designmatrix,
-    HOGDINA = 0,
+    delta.designmatrix = delta_designmatrix,
+    HOGDINA = hogdina_value,
     progress = FALSE
   )
 
   if (progress == TRUE) {
-    print(
-      "Estimation is complete. Use the CDM summary function to display results.",
-      quote = FALSE
+    message(
+      "Estimation is complete. Use the CDM summary function to display results."
     )
   }
 
