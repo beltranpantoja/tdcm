@@ -86,7 +86,7 @@ oneplcdm <- function(data, q.matrix, progress = TRUE) { # open function
 
 
   if (progress == TRUE) {
-    print("Estimating 1-PLCDM...", quote = FALSE)
+    message("Estimating 1-PLCDM...")
   }
 
   # A trick to pass the proper hogdina value to the gdina function.
@@ -98,7 +98,7 @@ oneplcdm <- function(data, q.matrix, progress = TRUE) { # open function
     q.matrix,
     linkfct = "logit",
     method = "ML",
-    delta.designmatrix = delta_designmatrix,
+    delta.designmatrix = design_matrix,
     HOGDINA = hogdina_value,
     progress = FALSE
   )

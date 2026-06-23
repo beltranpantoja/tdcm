@@ -3,12 +3,9 @@
 #' @param data item response data
 #' @param qmatrix_list a list of \eqn{I \times A} matrices indicating which
 #'  items measure which attributes.
-#' @param num.time.points number of time points
 #' @param invariance invariance assumption (T or F)
 #' @param rule specific DCM to estimate
 #' @param linkfct specific link function for the LCDM
-#' @param num.q.matrix number of Q-matrices
-#' @param num.items number of items for each Q-matrix
 #' @param forget.att vector of attributes not allowing regression/forgetting
 #' @param anchor anchor items specified as pairs in a vector
 #' @keywords internal
@@ -20,14 +17,20 @@ tdcm.mq <- function(
   rule = "LCDM",
   linkfct = "logit",
   forget.att = NULL,
-  anchor = NULL,
-  progress = TRUE
+  anchor = NULL
 ) {
   # ===========================================================================
   # SETTING THE COMPLETE QMATRIX
   # ===========================================================================
 
-  qnew <- Matrix::.bdiag(qmatrix_list)
+  # We convert the elements to matrices
+  qmatrix_list <- lapply(
+    qmatrix_list,
+    as.matrix
+  )
+
+  # We join diagonally and convert to a regular R matrix
+  qnew <- as.matrix(Matrix::.bdiag(qmatrix_list))
 
   # ===========================================================================
   # SETTING THE DESIGN MATRIX

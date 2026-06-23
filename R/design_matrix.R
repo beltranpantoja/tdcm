@@ -20,8 +20,8 @@ create_base_design_matrix <- function(qmatrix, rule) {
   } else {
     # Fake response data to pass to `tdcm.base`
     data <- matrix(
-      sample(c(0, 1), 1000 * ncol(qmatrix), replace = TRUE),
-      ncol = ncol(qmatrix)
+      sample(c(0, 1), 1000 * nrow(qmatrix), replace = TRUE),
+      ncol = nrow(qmatrix)
     )
 
     # This creates a dummy model that we can use to handle the
@@ -68,9 +68,15 @@ design_matrix_1plcdm <- function(qmatrix) {
       design_matrix[main_effects_idx, ] <- 0
       design_matrix[seq(2, nrow(design_matrix), by = 2), 2] <- 1
 
-      # Return without the empty columns.
       remove_cols <- which(colSums(design_matrix) == 0)
-      design_matrix[, -remove_cols]
+
+      # Remove empty columns.
+      if (length(remove_cols) > 0) {
+        design_matrix <- design_matrix[, -remove_cols, drop = FALSE]
+      }
+
+      # Return without the empty columns.
+      design_matrix
     }
   )
 

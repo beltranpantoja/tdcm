@@ -711,19 +711,16 @@ tdcm <- function(
 ) {
   # Printing messages
   if (progress) {
-    print("Preparing data for tdcm()...",
-      quote = FALSE
-    )
-    print("Estimating the TDCM in tdcm()...",
-      quote = FALSE
-    )
-    print("Depending on model complexity, estimation time may vary...",
-      quote = FALSE
-    )
+    message("Preparing data for tdcm()...")
+    message("Estimating the TDCM in tdcm()...")
+    message("Depending on model complexity, estimation time may vary...")
   }
 
 
+  # ===========================================================================
   # translate rule argument
+  # ===========================================================================
+
   rule <- tdcm.rule.as.cdm.rule(rule)
 
 
@@ -741,7 +738,6 @@ tdcm <- function(
   # can save redundant arguments.
   # ===========================================================================
 
-  # First we create the list of Q-matrices
   if (num.q.matrix == 1) { # The same Q-matrix repeated every time
 
     # We need to replicate the Q-matrix by the number of points
@@ -751,6 +747,9 @@ tdcm <- function(
       simplify = FALSE
     )
   } else { # Several Q-matrices, one per time
+
+    # If there are several Q-matrices, then we can't have invariance
+    invariance <- FALSE
 
     # We check that the arguments are correctly specified
     if (num.q.matrix != length(num.items)) {
@@ -764,7 +763,7 @@ tdcm <- function(
 
     matrix_list <- lapply(
       row_indices,
-      function(idx) q.matrix[idx, , drop = FALSE]
+      function(idx) as.matrix(q.matrix[idx, , drop = FALSE])
     )
   }
 
@@ -774,16 +773,12 @@ tdcm <- function(
 
   tdcm <- tdcm.mq(
     data = data,
-    q.matrix = q.matrix,
-    num.time.points = num.time.points,
-    invariance = FALSE,
+    qmatrix_list = matrix_list,
+    invariance = invariance,
     rule = rule,
     linkfct = linkfct,
-    num.q.matrix = num.q.matrix,
-    num.items = num.items,
-    forget.att = c(),
-    anchor = anchor,
-    progress = progress
+    forget.att = forget.att,
+    anchor = anchor
   )
 
   # ===========================================================================
@@ -795,17 +790,12 @@ tdcm <- function(
   tdcm$numtimepoints <- num.time.points
   tdcm$qt.matrix <- q.matrix
 
-  tdcm$invariance <- FALSE
-
-  # TODO: I am not completely sure if having anchors count as being invariant
-  if (any(!is.null(anchor), invariance)) {
-    tdcm$invariance <- TRUE
-  }
+  tdcm$invariance <- invariance
 
 
   if (progress) {
-    print("TDCM estimation complete.", quote = FALSE)
-    print("Use tdcm.summary() to display results.", quote = FALSE)
+    message("TDCM estimation complete.")
+    message("Use tdcm.summary() to display results.")
   }
 
   return(tdcm)

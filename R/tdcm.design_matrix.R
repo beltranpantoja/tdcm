@@ -25,39 +25,46 @@ design_matrix_TDCM <- function(
   anchors = NULL,
   rule = "GDINA"
 ) {
-  # We create base design matrices for all Q-matrices
-  design_matrices <- lapply(
-    qmatrix_list,
-    function(qmat) {
-      create_base_design_matrix(qmat, rule)
-    }
-  )
+  # ======================================================
+  # COMPLETE QMATRIX
+  # ======================================================
 
+  # Normalizing just in case
+  qmatrix_list <- lapply(qmatrix_list, as.matrix)
+  qnew <- as.matrix(Matrix::.bdiag(qmatrix_list))
 
   # ======================================================
   # INVARIANCE LOGIC
-  # if invariant it basically means all items are anchors
-  # so the easiest way is to just bind the design matrices
-  # (this assumes the qmatrices in the list are all the same)
+  # It means we basically have the same design matrix stacked
   # ======================================================
 
   if (invariance == TRUE) {
-    design_matrix <- do.call(rbind, design_matrices)
+    base_design_matrix <- create_base_design_matrix(
+      qmatrix_list[[1]],
+      rule = rule
+    )
+
+    design_matrix_list <- replicate(
+      length(qmatrix_list),
+      base_design_matrix,
+      simplify = FALSE
+    )
+
+    design_matrix <- do.call(rbind, design_matrix_list)
 
     # Early return
     return(design_matrix)
   }
 
   # ======================================================
-  # If not invariant, we need to collate them diagonally
+  # DESIGN MATRIX
   # ======================================================
 
+  # We create the base design matrix based on the Q-matrix
+  design_matrix <- create_base_design_matrix(qnew, rule = rule)
 
-  # Then we join it into a single design matrix
-  design_matrix <- Matrix::.bdiag(design_matrices)
 
-
-  # If there are no anchors then we just return the design matrix
+  # If there are no anchors then we just return the design matrix as is
   if (is.null(anchors)) {
     return(design_matrix)
   }
@@ -67,8 +74,6 @@ design_matrix_TDCM <- function(
   # ======================================================
 
   # We create the table of the parameters to guide the anchoring process
-
-  qnew <- Matrix::.bdiag(qmatrix_list)
   data <- matrix(
     sample(c(0, 1), 1000 * ncol(qnew), replace = TRUE),
     ncol = ncol(qnew)
@@ -77,7 +82,7 @@ design_matrix_TDCM <- function(
 
 
   # The anchoring matrix established the anchor pairs
-  anchor_matrix <- matrix(anchor, ncol = 2, byrow = TRUE)
+  anchor_matrix <- matrix(anchors, ncol = 2, byrow = TRUE)
 
   # We iterate over each each anchor-pair
   for (row in seq_len(nrow(anchor_matrix))) {
