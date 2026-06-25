@@ -7,7 +7,7 @@
 #' @param qmatrix_list a list of \eqn{I \times A} matrices indicating which
 #'  items measure which attributes. This function assumes that if there's a
 #'  single qmatrix it was already.
-#'  @param invariance logical. If `TRUE` then item parameters will be
+#'  @param time.invariance logical. If `TRUE` then item parameters will be
 #'    constrained to be equal at each time point.
 #' @param anchors a list of items to be anchored. They should be given as pairs.
 #'  (e.g. `c(1,11,3,15)` would imply that items 1 and 11 are the same and 3 and
@@ -21,9 +21,11 @@
 #' @noRd
 design_matrix_TDCM <- function(
   qmatrix_list,
-  invariance = TRUE,
+  time.invariance = TRUE,
   anchors = NULL,
-  rule = "GDINA"
+  rule = "GDINA",
+  group = NULL,
+  group_invariance = TRUE
 ) {
   # ======================================================
   # COMPLETE QMATRIX
@@ -34,14 +36,16 @@ design_matrix_TDCM <- function(
   qnew <- as.matrix(Matrix::.bdiag(qmatrix_list))
 
   # ======================================================
-  # INVARIANCE LOGIC
+  # DESIGN MATRIX - INVARIANCE LOGIC
   # It means we basically have the same design matrix stacked
   # ======================================================
 
-  if (invariance == TRUE) {
+  if (time.invariance == TRUE) {
     base_design_matrix <- create_base_design_matrix(
       qmatrix_list[[1]],
-      rule = rule
+      rule = rule,
+      group = group,
+      group_invariance = group_invariance
     )
 
     design_matrix_list <- replicate(
@@ -57,11 +61,16 @@ design_matrix_TDCM <- function(
   }
 
   # ======================================================
-  # DESIGN MATRIX
+  # DESIGN MATRIX - NO INVARIANCE
   # ======================================================
 
   # We create the base design matrix based on the Q-matrix
-  design_matrix <- create_base_design_matrix(qnew, rule = rule)
+  design_matrix <- create_base_design_matrix(
+    qnew,
+    rule = rule,
+    group = group,
+    group_invariance = group_invariance
+  )
 
 
   # If there are no anchors then we just return the design matrix as is
@@ -78,8 +87,14 @@ design_matrix_TDCM <- function(
     sample(c(0, 1), 1000 * ncol(qnew), replace = TRUE),
     ncol = ncol(qnew)
   )
-  c0 <- TDCM:::tdcm.base(data, qnew, rule)$coef
 
+  c0 <- TDCM:::tdcm.base(
+    data,
+    qnew,
+    rule,
+    group = groups,
+    group_invariance = group_invariance
+  )$coef
 
   # The anchoring matrix established the anchor pairs
   anchor_matrix <- matrix(anchors, ncol = 2, byrow = TRUE)

@@ -14,21 +14,57 @@
 #'
 #' @keywords internal
 #' @noRd
-create_base_design_matrix <- function(qmatrix, rule) {
+create_base_design_matrix <- function(
+  qmatrix,
+  rule,
+  group = NULL,
+  group_invariance = TRUE
+) {
   if (rule == "1PLCDM") {
     design_matrix <- design_matrix_1plcdm(qmatrix)
   } else {
+    # ================================================================
     # Fake response data to pass to `tdcm.base`
+    # ================================================================
+
+    examinees <- 1000
+
+    # If there's a group vector then the lengths have to coincide
+    if (!is.null(group)) {
+      examinees <- length(group)
+    }
+
     data <- matrix(
-      sample(c(0, 1), 1000 * nrow(qmatrix), replace = TRUE),
+      sample(c(0, 1), examinees * nrow(qmatrix), replace = TRUE),
       ncol = nrow(qmatrix)
     )
 
+    # Apparently not having colnames lead to errors later
+    colnames(data) <- paste0("item", seq_len(ncol(data)))
+
+
+    # Similarly with naming the attributes
+
+
+    # ================================================================
+    # Leveraging the CDM functions
+    # ================================================================
+
     # This creates a dummy model that we can use to handle the
     # number of parameters that come from the `rule` argument.
-    m0 <- TDCM:::tdcm.base(data, qmatrix, rule)
+    m0 <- tdcm.base(
+      data,
+      qmatrix,
+      rule,
+      group = group,
+      group_invariance = group_invariance
+    )
 
-    # Base design matrix
+    # ================================================================
+    # Design Matrix
+    # ================================================================
+
+    # Each row of the item coef corresponds to a parameter
     design_matrix <- diag(nrow(m0$coef))
   }
 

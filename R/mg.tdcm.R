@@ -1,6 +1,6 @@
 #' Estimating the multigroup transition diagnostic classification model (TDCM)
 #'
-#'\code{mg.tdcm()} estimates the Transition Diagnostic Classification Model for scenarios involving multiple groups (e.g., control and treatment group; Madison & Bradshaw, 2018b). Similar to \code{tdcm()}, this function supports the estimation of various DCMs by allowing different rule specifications via the `rule` option and link functions via the `linkfct` option,with LCDM as the default rule and link function. The rule can be modified to estimate the DINA model, DINO model, CRUM (i.e., ACDM, or main effects model), or reduced interaction versions of the LCDM. Additionally, the link function can be adjusted to specify the GDINA model.
+#' \code{mg.tdcm()} estimates the Transition Diagnostic Classification Model for scenarios involving multiple groups (e.g., control and treatment group; Madison & Bradshaw, 2018b). Similar to \code{tdcm()}, this function supports the estimation of various DCMs by allowing different rule specifications via the `rule` option and link functions via the `linkfct` option,with LCDM as the default rule and link function. The rule can be modified to estimate the DINA model, DINO model, CRUM (i.e., ACDM, or main effects model), or reduced interaction versions of the LCDM. Additionally, the link function can be adjusted to specify the GDINA model.
 #'
 #' @param data A required \eqn{N \times T \times I} `matrix` or `data.frame` where rows correspond to `N` examinees and columns represent the binary item responses across `T` time points and `I` items.
 #'
@@ -24,6 +24,8 @@
 #'
 #' @param progress logical argument. If `FALSE`, the function will print the progress of estimation. If `TRUE` (default), no progress information is printed.
 #'
+#' @param gdina_extra list of extra arguments to be passed to the gdina function.
+#'
 #' @return An object of class \code{gdina} with entries as indicated in the \pkg{CDM} package. For the TDCM-specific results (e.g., growth, transitions), use `TDCM::mg.tdcm.summary()`.
 #'
 #' @details
@@ -45,8 +47,8 @@
 #' - \eqn{\pi_{ic_{t,g}}} is the item response function, which models the probability of
 #' answering item \eqn{i} correctly at time \eqn{t} given attribute profile \eqn{c} and observed group \eqn{g}.
 #'
-#'Therefore, if the study purpose is to assess growth between a treatment and control group in a pre-
-#'and post-test design, the probability of the item response vector reduces to:
+#' Therefore, if the study purpose is to assess growth between a treatment and control group in a pre-
+#' and post-test design, the probability of the item response vector reduces to:
 #'
 #' \deqn{
 #' P(X_e = x_e|G=g) = \sum_{c_1=1}^{C} \sum_{c_2=1}^{C}
@@ -55,15 +57,15 @@
 #'
 #' **Accounting for Measurement Invariance**
 #'
-#'Measurement invariance indicates whether the **item response function** remains
-#'constant over time points (**time invariance**) or across groups (**group invariance**). Note that
-#'regardless of the assumed invariance, attribute
-#'mastery transitions can still be compared across time and groups.
+#' Measurement invariance indicates whether the **item response function** remains
+#' constant over time points (**time invariance**) or across groups (**group invariance**). Note that
+#' regardless of the assumed invariance, attribute
+#' mastery transitions can still be compared across time and groups.
 #'
-#'Depending on the assumed constrained, one of the four measurement
-#'invariance conditions can be applied:
+#' Depending on the assumed constrained, one of the four measurement
+#' invariance conditions can be applied:
 #'
-#'Consider an experiment design with a treatment and control group.
+#' Consider an experiment design with a treatment and control group.
 #'
 #' ## **a) No time Invariance across time or group invariance assumed**
 #'
@@ -124,9 +126,11 @@
 #' groups <- data.tdcm04$groups
 #'
 #' # Estimate model
-#' mg.model1 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-#'                            groups = groups, time.invariance = FALSE,
-#'                            group.invariance = FALSE)
+#' mg.model1 <- TDCM::mg.tdcm(data, q.matrix,
+#'   num.time.points = 2,
+#'   groups = groups, time.invariance = FALSE,
+#'   group.invariance = FALSE
+#' )
 #'
 #' # Summarize results
 #' results1 <- TDCM::mg.tdcm.summary(mg.model1)
@@ -237,9 +241,11 @@
 #' ############################################################################
 #'
 #' # Estimate model
-#' mg.model2 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-#'                            groups = groups, time.invariance = FALSE,
-#'                            group.invariance = TRUE)
+#' mg.model2 <- TDCM::mg.tdcm(data, q.matrix,
+#'   num.time.points = 2,
+#'   groups = groups, time.invariance = FALSE,
+#'   group.invariance = TRUE
+#' )
 #'
 #' # summarize results
 #' results2 <- TDCM::mg.tdcm.summary(mg.model2)
@@ -303,9 +309,11 @@
 #' ############################################################################
 #'
 #' # Estimate model
-#' mg.model3 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-#'                            groups = groups, time.invariance = TRUE,
-#'                            group.invariance = FALSE)
+#' mg.model3 <- TDCM::mg.tdcm(data, q.matrix,
+#'   num.time.points = 2,
+#'   groups = groups, time.invariance = TRUE,
+#'   group.invariance = FALSE
+#' )
 #'
 #' # summarize results
 #' results3 <- TDCM::mg.tdcm.summary(mg.model3)
@@ -374,8 +382,10 @@
 #' ############################################################################
 #'
 #' # Estimate model
-#' mg.model4 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-#'                            groups = groups)
+#' mg.model4 <- TDCM::mg.tdcm(data, q.matrix,
+#'   num.time.points = 2,
+#'   groups = groups
+#' )
 #'
 #' # summarize results
 #' results4 <- TDCM::mg.tdcm.summary(mg.model4)
@@ -419,15 +429,17 @@
 #' # Compare model 1 (no time invariance) with model 3 (time invariance)
 #' TDCM::tdcm.compare(mg.model1, mg.model3)
 #'
-#'#############################################################################
-#'# Example 6: DINA multigroup TDCM with time and group invariance assumed
-#'############################################################################
+#' #############################################################################
+#' # Example 6: DINA multigroup TDCM with time and group invariance assumed
+#' ############################################################################
 #'
 #' # Estimate model
-#' mg.model6 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-#'                            rule = "DINA",
-#'                            groups = groups, time.invariance = TRUE,
-#'                            group.invariance = TRUE)
+#' mg.model6 <- TDCM::mg.tdcm(data, q.matrix,
+#'   num.time.points = 2,
+#'   rule = "DINA",
+#'   groups = groups, time.invariance = TRUE,
+#'   group.invariance = TRUE
+#' )
 #'
 #' # summarize results
 #' results6 <- TDCM::mg.tdcm.summary(mg.model6)
@@ -436,15 +448,17 @@
 #' results6$growth.effects
 #' results6$transition.probabilities
 #'
-#'#############################################################################
-#'# Example 7: DINO multigroup with time and group invariance assumed
-#'############################################################################
+#' #############################################################################
+#' # Example 7: DINO multigroup with time and group invariance assumed
+#' ############################################################################
 #'
 #' # Estimate model
-#' mg.model7 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-#'                            rule = "DINO",
-#'                            groups = groups, time.invariance = TRUE,
-#'                            group.invariance = TRUE)
+#' mg.model7 <- TDCM::mg.tdcm(data, q.matrix,
+#'   num.time.points = 2,
+#'   rule = "DINO",
+#'   groups = groups, time.invariance = TRUE,
+#'   group.invariance = TRUE
+#' )
 #'
 #' # summarize results
 #' results7 <- TDCM::mg.tdcm.summary(mg.model7)
@@ -453,15 +467,17 @@
 #' results7$growth.effects
 #' results7$transition.probabilities
 #'
-#'#############################################################################
-#'# Example 8: CRUM multigroup with time and group invariance assumed
-#'############################################################################
+#' #############################################################################
+#' # Example 8: CRUM multigroup with time and group invariance assumed
+#' ############################################################################
 #'
 #' # Estimate model
-#' mg.model8 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-#'                            rule = "CRUM",
-#'                            groups = groups, time.invariance = TRUE,
-#'                            group.invariance = TRUE)
+#' mg.model8 <- TDCM::mg.tdcm(data, q.matrix,
+#'   num.time.points = 2,
+#'   rule = "CRUM",
+#'   groups = groups, time.invariance = TRUE,
+#'   group.invariance = TRUE
+#' )
 #'
 #' # summarize results
 #' results8 <- TDCM::mg.tdcm.summary(mg.model8)
@@ -470,15 +486,17 @@
 #' results8$growth.effects
 #' results8$transition.probabilities
 #'
-#'#############################################################################
-#'# Example 9: RRUM multigroup with time and group invariance assumed
-#'############################################################################
+#' #############################################################################
+#' # Example 9: RRUM multigroup with time and group invariance assumed
+#' ############################################################################
 #'
 #' # Estimate model
-#' mg.model9 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-#'                            rule = "RRUM",
-#'                            groups = groups, time.invariance = TRUE,
-#'                            group.invariance = TRUE)
+#' mg.model9 <- TDCM::mg.tdcm(data, q.matrix,
+#'   num.time.points = 2,
+#'   rule = "RRUM",
+#'   groups = groups, time.invariance = TRUE,
+#'   group.invariance = TRUE
+#' )
 #'
 #' # summarize results
 #' results9 <- TDCM::mg.tdcm.summary(mg.model9)
@@ -487,295 +505,185 @@
 #' results9$growth.effects
 #' results9$transition.probabilities
 #'
-#'#############################################################################
-#'# Example 10: Multigroup TDCM with and without forgetting
-#'############################################################################
+#' #############################################################################
+#' # Example 10: Multigroup TDCM with and without forgetting
+#' ############################################################################
 #'
-#'##----------------------------------------------------------------------------
-#'# With forgetting
-#'#----------------------------------------------------------------------------
-#'## Consider a default model in which students can retain or lose their mastery status
-#'## from one time point to another
+#' ## ----------------------------------------------------------------------------
+#' # With forgetting
+#' #----------------------------------------------------------------------------
+#' ## Consider a default model in which students can retain or lose their mastery status
+#' ## from one time point to another
 #'
 #' # Estimate model
-#' mg.model10_forgetting <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-#'                            rule = "LCDM",
-#'                            groups = groups, time.invariance = TRUE,
-#'                            group.invariance = TRUE)
+#' mg.model10_forgetting <- TDCM::mg.tdcm(data, q.matrix,
+#'   num.time.points = 2,
+#'   rule = "LCDM",
+#'   groups = groups, time.invariance = TRUE,
+#'   group.invariance = TRUE
+#' )
 #'
-#'# Summarize results with mg.tdcm.summary().
-#' results_forgetting <- TDCM::mg.tdcm.summary(mg.model10_forgetting,transition.option = 1)
+#' # Summarize results with mg.tdcm.summary().
+#' results_forgetting <- TDCM::mg.tdcm.summary(mg.model10_forgetting, transition.option = 1)
 #' results_forgetting$transition.probabilities
-#'# , , Attribute 1: Time 1 to Time 2, Group 1
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.634  0.366
-#'# T1 [1]  0.399  0.601
-#'#
-#'# , , Attribute 2: Time 1 to Time 2, Group 1
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.571  0.429
-#'# T1 [1]  0.393  0.607
-#'#
-#'# , , Attribute 3: Time 1 to Time 2, Group 1
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.438  0.562
-#'# T1 [1]  0.185  0.815
-#'#
-#'# , , Attribute 4: Time 1 to Time 2, Group 1
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.334  0.666
-#'# T1 [1]  0.166  0.834
-#'#
-#'# , , Attribute 1: Time 1 to Time 2, Group 2
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.435  0.565
-#'# T1 [1]  0.231  0.769
-#'#
-#'# , , Attribute 2: Time 1 to Time 2, Group 2
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.362  0.638
-#'# T1 [1]  0.104  0.896
-#'#
-#'# , , Attribute 3: Time 1 to Time 2, Group 2
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.361  0.639
-#'# T1 [1]  0.073  0.927
-#'#
-#'# , , Attribute 4: Time 1 to Time 2, Group 2
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.353  0.647
-#'# T1 [1]  0.208  0.792
+#' # , , Attribute 1: Time 1 to Time 2, Group 1
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.634  0.366
+#' # T1 [1]  0.399  0.601
+#' #
+#' # , , Attribute 2: Time 1 to Time 2, Group 1
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.571  0.429
+#' # T1 [1]  0.393  0.607
+#' #
+#' # , , Attribute 3: Time 1 to Time 2, Group 1
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.438  0.562
+#' # T1 [1]  0.185  0.815
+#' #
+#' # , , Attribute 4: Time 1 to Time 2, Group 1
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.334  0.666
+#' # T1 [1]  0.166  0.834
+#' #
+#' # , , Attribute 1: Time 1 to Time 2, Group 2
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.435  0.565
+#' # T1 [1]  0.231  0.769
+#' #
+#' # , , Attribute 2: Time 1 to Time 2, Group 2
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.362  0.638
+#' # T1 [1]  0.104  0.896
+#' #
+#' # , , Attribute 3: Time 1 to Time 2, Group 2
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.361  0.639
+#' # T1 [1]  0.073  0.927
+#' #
+#' # , , Attribute 4: Time 1 to Time 2, Group 2
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.353  0.647
+#' # T1 [1]  0.208  0.792
 #'
-#'##----------------------------------------------------------------------------
-#'# Without forgetting
-#'#----------------------------------------------------------------------------
-#'## Consider a model in which students cannot lose their mastery status for attribute 4
-#'## from one time point to another.
+#' ## ----------------------------------------------------------------------------
+#' # Without forgetting
+#' #----------------------------------------------------------------------------
+#' ## Consider a model in which students cannot lose their mastery status for attribute 4
+#' ## from one time point to another.
 #'
-#'# Estimate  model
-#'mg.model10_noforgetting <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-#'                                       rule = "LCDM",
-#'                                       groups = groups, time.invariance = TRUE,
-#'                                       group.invariance = TRUE,
-#'                                       forget.at=c(4))
+#' # Estimate  model
+#' mg.model10_noforgetting <- TDCM::mg.tdcm(data, q.matrix,
+#'   num.time.points = 2,
+#'   rule = "LCDM",
+#'   groups = groups, time.invariance = TRUE,
+#'   group.invariance = TRUE,
+#'   forget.at = c(4)
+#' )
 #'
-#'# Summarize results with mg.tdcm.summary().
-#'results_noforgetting <- TDCM::mg.tdcm.summary(mg.model10_noforgetting,transition.option = 1 )
-#'results_noforgetting$transition.probabilities
-#'# , , Attribute 1: Time 1 to Time 2, Group 1
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.635  0.365
-#'# T1 [1]  0.396  0.604
-#'#
-#'# , , Attribute 2: Time 1 to Time 2, Group 1
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.570  0.430
-#'# T1 [1]  0.406  0.594
-#'#
-#'# , , Attribute 3: Time 1 to Time 2, Group 1
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.435  0.565
-#'# T1 [1]  0.199  0.801
-#'#
-#'# , , Attribute 4: Time 1 to Time 2, Group 1
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.376  0.624
-#'# T1 [1]  0.000  1.000
-#'#
-#'# , , Attribute 1: Time 1 to Time 2, Group 2
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.435  0.565
-#'# T1 [1]  0.241  0.759
-#'#
-#'# , , Attribute 2: Time 1 to Time 2, Group 2
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.365  0.635
-#'# T1 [1]  0.122  0.878
-#'#
-#'# , , Attribute 3: Time 1 to Time 2, Group 2
-#'#
-#'#        T2 [0] T2 [1]
-#'# T1 [0]  0.361  0.639
-#'# T1 [1]  0.075  0.925
-#'#
-#'# , , Attribute 4: Time 1 to Time 2, Group 2
-#'#
-#'#         T2 [0] T2 [1]
-#'# T1 [0]  0.415  0.585
-#'# T1 [1]  0.000  1.000
+#' # Summarize results with mg.tdcm.summary().
+#' results_noforgetting <- TDCM::mg.tdcm.summary(mg.model10_noforgetting, transition.option = 1)
+#' results_noforgetting$transition.probabilities
+#' # , , Attribute 1: Time 1 to Time 2, Group 1
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.635  0.365
+#' # T1 [1]  0.396  0.604
+#' #
+#' # , , Attribute 2: Time 1 to Time 2, Group 1
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.570  0.430
+#' # T1 [1]  0.406  0.594
+#' #
+#' # , , Attribute 3: Time 1 to Time 2, Group 1
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.435  0.565
+#' # T1 [1]  0.199  0.801
+#' #
+#' # , , Attribute 4: Time 1 to Time 2, Group 1
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.376  0.624
+#' # T1 [1]  0.000  1.000
+#' #
+#' # , , Attribute 1: Time 1 to Time 2, Group 2
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.435  0.565
+#' # T1 [1]  0.241  0.759
+#' #
+#' # , , Attribute 2: Time 1 to Time 2, Group 2
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.365  0.635
+#' # T1 [1]  0.122  0.878
+#' #
+#' # , , Attribute 3: Time 1 to Time 2, Group 2
+#' #
+#' #        T2 [0] T2 [1]
+#' # T1 [0]  0.361  0.639
+#' # T1 [1]  0.075  0.925
+#' #
+#' # , , Attribute 4: Time 1 to Time 2, Group 2
+#' #
+#' #         T2 [0] T2 [1]
+#' # T1 [0]  0.415  0.585
+#' # T1 [1]  0.000  1.000
 #' }
 #'
 #' @export
 mg.tdcm <- function(
+  data,
+  q.matrix,
+  num.time.points,
+  rule = "LCDM",
+  linkfct = "logit",
+  group,
+  forget.att = c(),
+  group_invariance = TRUE,
+  time.invariance = TRUE,
+  progress = TRUE,
+  gdina_extra = list()
+) {
+  # We can just call the main one
+  tdcm <- tdcm(
     data,
     q.matrix,
-    num.time.points,
-    rule = "LCDM",
-    linkfct = "logit",
-    groups,
-    forget.att = c(),
-    group.invariance = TRUE,
-    time.invariance = TRUE,
-    progress = TRUE
-) {
+    num.time.points = num.time.points,
+    time.invariance = time.invariance,
+    rule = rule,
+    linkfct = linkfct,
+    num.q.matrix = 1,
+    num.items = nrow(q.matrix),
+    forget.att = forget.att,
+    group = group,
+    group_invariance = group_invariance,
+    progress = progress,
+    gdina_extra = gdina_extra
+  )
 
-  #translate rule argument
-  if(rule == "LCDM"){rule = "GDINA"}
-  else if(rule == "CRUM"){rule = "ACDM"}
-  else if(rule == "DINA"){rule = "DINA"}
-  else if(rule == "DINO"){rule = "DINO"}
-  else if(rule == "RRUM"){rule = "RRUM"}
-  else if(rule == "LCDM1"){rule = "GDINA1"}
-  else if(rule == "LCDM2"){rule = "GDINA2"}
-  else if(rule == "LCDM3"){rule = "GDINA3"}
-  else if(rule == "LCDM4"){rule = "GDINA4"}
-  else if(rule == "LCDM5"){rule = "GDINA5"}
-  else if(rule == "LCDM6"){rule = "GDINA6"}
-  else if(rule == "LCDM7"){rule = "GDINA7"}
-  else if(rule == "LCDM8"){rule = "GDINA8"}
-  else if(rule == "LCDM9"){rule = "GDINA9"}
-  else if(rule == "LCDM10"){rule = "GDINA10"}
-
-
-  if (progress) {
-    print("Preparing data for mg.tdcm()...", quote = FALSE)
-  } # if
-
-  # Initial Data Sorting
-  n.items <- ncol(data) # Total Items
-  items <- n.items / num.time.points # Items per time point
-  N <- nrow(data) # Number of Examinees
-  n.att <- ncol(q.matrix) # Number of Attributes
-  group.invariance <- group.invariance
-  time.invariance <- time.invariance
-  num.groups <- length(unique(groups))
-  colnames(data) <- paste("Item", 1:n.items)
-
-  qnew <- matrix(0, ncol = n.att * num.time.points, nrow = n.items)
-  for (z in 1:num.time.points) {
-    for (i in 1:items) {
-      for (j in 1:n.att) {
-        qnew[i + ((z - 1) * items), j + ((z - 1) * n.att)] <- q.matrix[i, j]
-      }
-    }
-  }
-
-  if (progress) {
-    print("Estimating the multigroup TDCM in mg.tdcm()...", quote = FALSE)
-    print("Depending on model complexity, estimation time may vary...", quote = FALSE)
-  } # if
-
-  #if user constraints forgetting
-  if(length(forget.att != 0)){
-
-    #reduce the skill space
-    m0 <- tdcm.base(data, qnew, rule)
-    full.space = m0$attribute.patt.splitted
-
-    forget = c()
-    for(i in forget.att){
-
-      rows = which(full.space[,i] > full.space[,i+n.att])
-      forget = append(forget, rows)
-
-    }
-
-    forget = unique(forget)
-    red.space = full.space[-forget,]
-
-  } else{#full skill space
-
-    m0 <- tdcm.base(data, qnew, rule)
-    red.space = m0$attribute.patt.splitted
-
-  }
-
-
-  # Case 1: all invariance
-  if (group.invariance == TRUE & time.invariance == TRUE) {
-    # base model, 1 iteration for design matrix
-    tdcm.1 <- CDM::gdina(data, qnew,
-                         linkfct = linkfct, method = "ML", mono.constr = TRUE,
-                         group = groups, progress = FALSE, maxit = 1, rule = rule)
-
-    # build design matrix
-    c0 <- tdcm.1$coef
-    c.0 <- nrow(c0)
-    designmatrix <- diag(nrow = c.0 / num.time.points, ncol = c.0 / num.time.points)
-    delta.designmatrix <- matrix(rep(t(designmatrix), num.time.points), ncol = ncol(designmatrix), byrow = TRUE)
-
-    # estimate mg tdcm
-    tdcm <- CDM::gdina(data, qnew,
-                       group = groups, linkfct = linkfct, method = "ML", skillclasses = red.space,
-                       delta.designmatrix = delta.designmatrix, rule = rule, reduced.skillspace = FALSE,
-                       progress = FALSE)
-  }
-
-  # Case 2: group invariance, no time invariance
-  else if (group.invariance == TRUE & time.invariance == FALSE) {
-    # estimate mg tdcm
-    tdcm <- CDM::gdina(data, qnew,
-                       group = groups, linkfct = linkfct, method = "ML", progress = FALSE,
-                       rule = rule, skillclasses = red.space, reduced.skillspace = FALSE)
-  }
-
-  # Case 3: time invariance, no group invariance
-  else if (group.invariance == FALSE & time.invariance == TRUE) {
-    # base model, 1 iteration for design matrix
-    tdcm.1 <- CDM::gdina(data, qnew,
-                         linkfct = linkfct, method = "ML", mono.constr = TRUE,skillclasses = red.space,
-                         group = groups, progress = FALSE, maxit = 1, rule = rule, reduced.skillspace = FALSE,
-                         invariance = FALSE)
-
-    # build design matrix
-    c0 <- tdcm.1$coef
-    c.0 <- nrow(c0)
-    designmatrix <- diag(nrow = c.0 / num.time.points, ncol = c.0 / num.time.points)
-    delta.designmatrix <- matrix(rep(t(designmatrix), num.time.points), ncol = ncol(designmatrix), byrow = TRUE)
-
-    # estimate mg tdcm
-    tdcm <- CDM::gdina(data, qnew,
-                       group = groups, linkfct = linkfct, method = "ML", progress = FALSE,skillclasses = red.space,
-                       delta.designmatrix = delta.designmatrix, rule = rule,
-                       reduced.skillspace=FALSE, invariance = FALSE)
-  }
-
-  # Case 4: no group or time invariance
-  else {
-    # estimate mg tdcm
-    tdcm <- CDM::gdina(data, qnew,
-                       group = groups, linkfct = linkfct, method = "ML", progress = FALSE,
-                       skillclasses = red.space, rule = rule, reduced.skillspace = FALSE,
-                       invariance = FALSE)
-  }
-
-  tdcm$group.invariance <- group.invariance
+  tdcm$group.invariance <- group_invariance
   tdcm$time.invariance <- time.invariance
 
   # set progress value in result object
   tdcm$progress <- progress
 
-  #save number of time points
-  tdcm$numtimepoints = num.time.points
+  # save number of time points
+  tdcm$numtimepoints <- num.time.points
 
   if (progress) {
-    print("Multigroup TDCM estimation complete.", quote = FALSE)
-    print("Use mg.tdcm.summary() to display results.", quote = FALSE)
-
+    message("Multigroup TDCM estimation complete.")
+    message("Use mg.tdcm.summary() to display results.")
   } # if
 
   return(tdcm)

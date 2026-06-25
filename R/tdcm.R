@@ -107,10 +107,15 @@
 #'   c(2,4)}, then forgetting for Attributes 2 and 4 is not allowed,
 #'   while other attributes can exhibit forgetting.
 #'
+#' @param group A required ``vector`` of integer group identifiers for
+#'    multiple group estimation.
+#'
 #' @param progress logical. If `FALSE`, the function will print the
 #'   progress of estimation. If `TRUE` (default), no progress
 #'   information
 #'   is printed.
+#'
+#' @param gdina_extra list of extra arguments to be passed to the gdina function.
 #'
 #' @details
 #'
@@ -262,23 +267,36 @@
 #'
 #' ### Modeling Forgetting in Attribute Transitions
 #'
-#' Unlike standard latent transition models that assume monotonic learning,TDCM allows for **both mastery acquisition and forgetting**. By default, TDCM does not impose that mastery must always increase over time. Instead, the transition probabilities \eqn{\tau_{c_t | c_{t-1}}} for examinee \eqn{e} can represent a transition from:
+#' Unlike standard latent transition models that assume monotonic learning,TDCM
+#' allows for **both mastery acquisition and forgetting**. By default, TDCM does
+#' not impose that mastery must always increase over time. Instead, the
+#' transition probabilities \eqn{\tau_{c_t | c_{t-1}}} for examinee \eqn{e} can
+#' represent a transition from:
 #' - A transition from non-mastery status to master attribute status (learning).
-#' - A transition from master attribute status to a non-mastery status (forgetting).
+#' - A transition from master attribute status to a non-mastery status
+#' forgetting).
 #'
-#' However, TDCM also allows for attribute-specific constrains, enabling to restrict transition probabilities for certain attributes.
+#' However, TDCM also allows for attribute-specific constrains, enabling to
+#' rstrict transition probabilities for certain attributes.
 #'
 #' ### Special Cases
 #'
-#' In TDCM, the item response function \eqn{\pi_{ic_{t}}} is parameterized using the LCDM. LCDM is a general and flexible model that allows special models to be derived by constraining specific parameters.
+#' In TDCM, the item response function \eqn{\pi_{ic_{t}}} is parameterized using
+#' th LCDM. LCDM is a general and flexible model that allows special models to
+#' be erived by constraining specific parameters.
 #'
 #' #### DINA Model
 #'
-#' The DINA model is a non-compensatory DCM, meaning that examinees can correctly answer to an item only if they have mastered all attributes required by that item. Given this characteristic, the DINA model is derived by constraining the main effects of the LCDM to zero, such that only the highest-order interaction term influences the item response probability.
+#' The DINA model is a non-compensatory DCM, meaning that examinees can
+#' corrctly answer to an item only if they have mastered all attributes
+#' requied by that item. Given this characteristic, the DINA model is derived
+#' by contraining the main effects of the LCDM to zero, such that only the
+#' highestorder interaction term influences the item response probability.
 #'
 #' ##### Example
 #'
-#' Suppose item 1 measures Attributes 1 and 2, and item invariance is assumed across time points.
+#' Suppose item 1 measures Attributes 1 and 2, and item invariance is assumed
+#' across tme points.
 #' The item response function for item 1 following the LCDM can be expressed as:
 #'
 #' \deqn{
@@ -700,14 +718,17 @@ tdcm <- function(
   data,
   q.matrix,
   num.time.points,
-  invariance = TRUE,
+  time.invariance = TRUE,
   rule = "LCDM",
   linkfct = "logit",
   num.q.matrix = 1,
   num.items = c(),
   anchor = NULL,
   forget.att = c(),
-  progress = TRUE
+  group = NULL,
+  group_invariance = TRUE,
+  progress = TRUE,
+  gdina_extra = list()
 ) {
   # Printing messages
   if (progress) {
@@ -749,7 +770,7 @@ tdcm <- function(
   } else { # Several Q-matrices, one per time
 
     # If there are several Q-matrices, then we can't have invariance
-    invariance <- FALSE
+    time.invariance <- FALSE
 
     # We check that the arguments are correctly specified
     if (num.q.matrix != length(num.items)) {
@@ -758,8 +779,8 @@ tdcm <- function(
 
 
     # We split the q.matrix into the sub q.matrices
-    groups <- rep(seq_along(num.items), times = num.items)
-    row_indices <- split(seq_len(nrow(q.matrix)), groups)
+    time_groups <- rep(seq_along(num.items), times = num.items)
+    row_indices <- split(seq_len(nrow(q.matrix)), time_groups)
 
     matrix_list <- lapply(
       row_indices,
@@ -774,11 +795,14 @@ tdcm <- function(
   tdcm <- tdcm.mq(
     data = data,
     qmatrix_list = matrix_list,
-    invariance = invariance,
+    time.invariance = time.invariance,
     rule = rule,
     linkfct = linkfct,
     forget.att = forget.att,
-    anchor = anchor
+    anchor = anchor,
+    group = group,
+    group_invariance = group_invariance,
+    gdina_extra = gdina_extra
   )
 
   # ===========================================================================
@@ -790,7 +814,7 @@ tdcm <- function(
   tdcm$numtimepoints <- num.time.points
   tdcm$qt.matrix <- q.matrix
 
-  tdcm$invariance <- invariance
+  tdcm$invariance <- time.invariance
 
 
   if (progress) {
