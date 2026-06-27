@@ -53,8 +53,15 @@ hcdm <- function(
     ...
   )
 
-  # We extend the gdina class so we can define it's own methods
+  # =======================================================================
+  # CLASS DEFINITION
+  # We extend the gdina class so we can define it's own methods and attributes
+  # =======================================================================
   class(model) <- c("hcdm", class(model))
+
+
+  model$hierarchy <- hierarchy
+  # =======================================================================
 
   return(model)
 }
@@ -77,7 +84,7 @@ get_HDCM_Mj <- function(hierarchy_str, q.matrix) {
   reduced_profiles_item <- lapply(
     seq_len(nrow(q.matrix)),
     FUN = \(i) {
-      skillspace$skillspace.reduced[, q.matrix[i, ] == 1]
+      skillspace$skillspace.reduced[, q.matrix[i, ] == 1, drop = FALSE]
     }
   )
 
@@ -89,7 +96,7 @@ get_HDCM_Mj <- function(hierarchy_str, q.matrix) {
 
   colnames(data) <- paste0("V", seq_len(nrow(q.matrix)))
 
-  mod <- CDM::gdina(data, q.matrix = qmat, maxit = 1, progress = FALSE)
+  mod <- CDM::gdina(data, q.matrix = q.matrix, maxit = 1, progress = FALSE)
 
 
   # We check the rows of the A design matrix which has all possible profiles
@@ -102,7 +109,8 @@ get_HDCM_Mj <- function(hierarchy_str, q.matrix) {
       A_rows %in% B_rows
     },
     A = mod$Aj,
-    B = reduced_profiles_item
+    B = reduced_profiles_item,
+    SIMPLIFY = FALSE
   )
 
   # Now we have the columns which are related to permisible parameters
