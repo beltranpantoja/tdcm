@@ -72,6 +72,14 @@ hcdm <- function(
 #' @keywords internal
 #' @noRd
 get_HDCM_Mj <- function(hierarchy_str, q.matrix) {
+  # We first check the hierarchy is correctly formed
+  hierarchy_skills <- unlist(strsplit(trimws(hierarchy_str), "[[:space:]>]+"))
+
+  if (!all(hierarchy_skills %in% colnames(q.matrix))) {
+    stop("Attributes on the hierarchy don't coincide with Q-matrix.")
+  }
+
+
   # 1. Get the skillspace of the hierarchy
   skillspace <- CDM::skillspace.hierarchy(
     hierarchy_str,
