@@ -718,15 +718,16 @@ tdcm <- function(
   data,
   q.matrix,
   num.time.points,
-  time.invariance = TRUE,
-  rule = "LCDM",
-  linkfct = "logit",
   num.q.matrix = 1,
   num.items = c(),
+  rule = "LCDM",
+  linkfct = "logit",
+  time.invariance = TRUE,
   anchor = NULL,
-  forget.att = c(),
+  forget.att = NULL,
   group = NULL,
   group_invariance = TRUE,
+  hierarchy = NULL,
   progress = TRUE,
   gdina_extra = list()
 ) {
@@ -752,6 +753,10 @@ tdcm <- function(
   # If invariance is TRUE then there shouldn't be multiple qmatrices.
   # ===========================================================================
 
+  # We clean up the formatting of the hierarchy string
+  if (!is.null(hierarchy)) {
+    hierarchy <- trimws(hierarchy)
+  }
 
   # ===========================================================================
   # SETTING LIST OF QMATRICES
@@ -802,6 +807,7 @@ tdcm <- function(
     anchor = anchor,
     group = group,
     group_invariance = group_invariance,
+    hierarchy = hierarchy,
     gdina_extra = gdina_extra
   )
 

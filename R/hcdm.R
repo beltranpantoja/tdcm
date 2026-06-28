@@ -26,6 +26,9 @@ hcdm <- function(
   linkfct = "logit",
   ...
 ) {
+  # We cleanup the hierarchy string
+  hierarchy <- trimws(hierarchy)
+
   # We get the reduced skill space
   skillspace <- CDM::skillspace.hierarchy(
     hierarchy,
@@ -49,6 +52,7 @@ hcdm <- function(
     Mj = restricted_Mj,
     avoid.zeroprobs = TRUE,
     link = linkfct,
+    method = "ML",
     rule = "GDINA", # The rules are enforced through the hierarchy only
     ...
   )
@@ -72,6 +76,10 @@ hcdm <- function(
 #' @keywords internal
 #' @noRd
 get_HDCM_Mj <- function(hierarchy_str, q.matrix) {
+  # We clean up the formatting of the hierarchy string
+  hierarchy_str <- trimws(hierarchy_str)
+
+
   # We first check the hierarchy is correctly formed
   hierarchy_skills <- unlist(strsplit(trimws(hierarchy_str), "[[:space:]>]+"))
 

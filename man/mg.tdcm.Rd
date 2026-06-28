@@ -10,11 +10,12 @@ mg.tdcm(
   num.time.points,
   rule = "LCDM",
   linkfct = "logit",
-  groups,
+  group,
   forget.att = c(),
-  group.invariance = TRUE,
+  group_invariance = TRUE,
   time.invariance = TRUE,
-  progress = TRUE
+  progress = TRUE,
+  gdina_extra = list()
 )
 }
 \arguments{
@@ -30,15 +31,17 @@ The vector must have length equal to the total number of items across all time p
 \item{linkfct}{A \code{string} or a \code{vector} indicating the LCDM link function. Currently accepts "logit" (default) to estimate the LCDM, "identity" to estimate the GDINA model, and "log" link function to estimate the reduced reparameterized unified model (RRUM).
 The vector must have length equal to the total number of items across all time points.}
 
-\item{groups}{A required \code{vector} of integer group identifiers for multiple group estimation.}
-
 \item{forget.att}{An optional \code{vector} allowing for constraining of individual attribute proficiency loss, or forgetting. The default allows forgetting for each measured attribute (e.g., \eqn{P(1 \rightarrow 0) \neq 0}). See \link{tdcm} for more detailed information.}
-
-\item{group.invariance}{logical argument. If \code{TRUE} (default), item parameters are assumed to be equal for all groups. If \code{FALSE}, item parameters are not assumed to be equal for all groups.}
 
 \item{time.invariance}{logical argument. If \code{TRUE} (default), item parameters are assumed to be equal for all time points. If \code{FALSE}, item parameters are not assumed to be equal for all time points.}
 
 \item{progress}{logical argument. If \code{FALSE}, the function will print the progress of estimation. If \code{TRUE} (default), no progress information is printed.}
+
+\item{gdina_extra}{list of extra arguments to be passed to the gdina function.}
+
+\item{groups}{A required \code{vector} of integer group identifiers for multiple group estimation.}
+
+\item{group.invariance}{logical argument. If \code{TRUE} (default), item parameters are assumed to be equal for all groups. If \code{FALSE}, item parameters are not assumed to be equal for all groups.}
 }
 \value{
 An object of class \code{gdina} with entries as indicated in the \pkg{CDM} package. For the TDCM-specific results (e.g., growth, transitions), use \code{TDCM::mg.tdcm.summary()}.
@@ -146,9 +149,11 @@ q.matrix <- data.tdcm04$q.matrix
 groups <- data.tdcm04$groups
 
 # Estimate model
-mg.model1 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-                           groups = groups, time.invariance = FALSE,
-                           group.invariance = FALSE)
+mg.model1 <- TDCM::mg.tdcm(data, q.matrix,
+  num.time.points = 2,
+  groups = groups, time.invariance = FALSE,
+  group.invariance = FALSE
+)
 
 # Summarize results
 results1 <- TDCM::mg.tdcm.summary(mg.model1)
@@ -259,9 +264,11 @@ TDCM::tdcm.plot(results1)
 ############################################################################
 
 # Estimate model
-mg.model2 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-                           groups = groups, time.invariance = FALSE,
-                           group.invariance = TRUE)
+mg.model2 <- TDCM::mg.tdcm(data, q.matrix,
+  num.time.points = 2,
+  groups = groups, time.invariance = FALSE,
+  group.invariance = TRUE
+)
 
 # summarize results
 results2 <- TDCM::mg.tdcm.summary(mg.model2)
@@ -325,9 +332,11 @@ TDCM::tdcm.plot(results2)
 ############################################################################
 
 # Estimate model
-mg.model3 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-                           groups = groups, time.invariance = TRUE,
-                           group.invariance = FALSE)
+mg.model3 <- TDCM::mg.tdcm(data, q.matrix,
+  num.time.points = 2,
+  groups = groups, time.invariance = TRUE,
+  group.invariance = FALSE
+)
 
 # summarize results
 results3 <- TDCM::mg.tdcm.summary(mg.model3)
@@ -396,8 +405,10 @@ TDCM::tdcm.plot(results3)
 ############################################################################
 
 # Estimate model
-mg.model4 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-                           groups = groups)
+mg.model4 <- TDCM::mg.tdcm(data, q.matrix,
+  num.time.points = 2,
+  groups = groups
+)
 
 # summarize results
 results4 <- TDCM::mg.tdcm.summary(mg.model4)
@@ -446,10 +457,12 @@ TDCM::tdcm.compare(mg.model1, mg.model3)
 ############################################################################
 
 # Estimate model
-mg.model6 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-                           rule = "DINA",
-                           groups = groups, time.invariance = TRUE,
-                           group.invariance = TRUE)
+mg.model6 <- TDCM::mg.tdcm(data, q.matrix,
+  num.time.points = 2,
+  rule = "DINA",
+  groups = groups, time.invariance = TRUE,
+  group.invariance = TRUE
+)
 
 # summarize results
 results6 <- TDCM::mg.tdcm.summary(mg.model6)
@@ -463,10 +476,12 @@ results6$transition.probabilities
 ############################################################################
 
 # Estimate model
-mg.model7 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-                           rule = "DINO",
-                           groups = groups, time.invariance = TRUE,
-                           group.invariance = TRUE)
+mg.model7 <- TDCM::mg.tdcm(data, q.matrix,
+  num.time.points = 2,
+  rule = "DINO",
+  groups = groups, time.invariance = TRUE,
+  group.invariance = TRUE
+)
 
 # summarize results
 results7 <- TDCM::mg.tdcm.summary(mg.model7)
@@ -480,10 +495,12 @@ results7$transition.probabilities
 ############################################################################
 
 # Estimate model
-mg.model8 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-                           rule = "CRUM",
-                           groups = groups, time.invariance = TRUE,
-                           group.invariance = TRUE)
+mg.model8 <- TDCM::mg.tdcm(data, q.matrix,
+  num.time.points = 2,
+  rule = "CRUM",
+  groups = groups, time.invariance = TRUE,
+  group.invariance = TRUE
+)
 
 # summarize results
 results8 <- TDCM::mg.tdcm.summary(mg.model8)
@@ -497,10 +514,12 @@ results8$transition.probabilities
 ############################################################################
 
 # Estimate model
-mg.model9 <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-                           rule = "RRUM",
-                           groups = groups, time.invariance = TRUE,
-                           group.invariance = TRUE)
+mg.model9 <- TDCM::mg.tdcm(data, q.matrix,
+  num.time.points = 2,
+  rule = "RRUM",
+  groups = groups, time.invariance = TRUE,
+  group.invariance = TRUE
+)
 
 # summarize results
 results9 <- TDCM::mg.tdcm.summary(mg.model9)
@@ -513,20 +532,22 @@ results9$transition.probabilities
 # Example 10: Multigroup TDCM with and without forgetting
 ############################################################################
 
-##----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 # With forgetting
 #----------------------------------------------------------------------------
 ## Consider a default model in which students can retain or lose their mastery status
 ## from one time point to another
 
 # Estimate model
-mg.model10_forgetting <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-                           rule = "LCDM",
-                           groups = groups, time.invariance = TRUE,
-                           group.invariance = TRUE)
+mg.model10_forgetting <- TDCM::mg.tdcm(data, q.matrix,
+  num.time.points = 2,
+  rule = "LCDM",
+  groups = groups, time.invariance = TRUE,
+  group.invariance = TRUE
+)
 
 # Summarize results with mg.tdcm.summary().
-results_forgetting <- TDCM::mg.tdcm.summary(mg.model10_forgetting,transition.option = 1)
+results_forgetting <- TDCM::mg.tdcm.summary(mg.model10_forgetting, transition.option = 1)
 results_forgetting$transition.probabilities
 # , , Attribute 1: Time 1 to Time 2, Group 1
 #
@@ -576,21 +597,23 @@ results_forgetting$transition.probabilities
 # T1 [0]  0.353  0.647
 # T1 [1]  0.208  0.792
 
-##----------------------------------------------------------------------------
+## ----------------------------------------------------------------------------
 # Without forgetting
 #----------------------------------------------------------------------------
 ## Consider a model in which students cannot lose their mastery status for attribute 4
 ## from one time point to another.
 
 # Estimate  model
-mg.model10_noforgetting <- TDCM::mg.tdcm(data, q.matrix, num.time.points = 2,
-                                      rule = "LCDM",
-                                      groups = groups, time.invariance = TRUE,
-                                      group.invariance = TRUE,
-                                      forget.at=c(4))
+mg.model10_noforgetting <- TDCM::mg.tdcm(data, q.matrix,
+  num.time.points = 2,
+  rule = "LCDM",
+  groups = groups, time.invariance = TRUE,
+  group.invariance = TRUE,
+  forget.at = c(4)
+)
 
 # Summarize results with mg.tdcm.summary().
-results_noforgetting <- TDCM::mg.tdcm.summary(mg.model10_noforgetting,transition.option = 1 )
+results_noforgetting <- TDCM::mg.tdcm.summary(mg.model10_noforgetting, transition.option = 1)
 results_noforgetting$transition.probabilities
 # , , Attribute 1: Time 1 to Time 2, Group 1
 #

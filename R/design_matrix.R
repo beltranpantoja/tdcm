@@ -8,6 +8,7 @@
 #'  measure which attributes.
 #' @param rule A string or a vector of itemwise condensation rules that
 #'  specific DCM to estimate.
+#' @param Mj Design matrix to be passed to the `gdina` call.
 #'
 #' @returns A design matrix to be used as `delta.designmatrix` parameter when
 #'  calling [CDM::gdina()].
@@ -18,8 +19,19 @@ create_base_design_matrix <- function(
   qmatrix,
   rule,
   group = NULL,
-  group_invariance = TRUE
+  group_invariance = TRUE,
+  Mj = NULL
 ) {
+  # ================================================================
+  # Validating parameters
+  # ================================================================
+
+  if (length(Mj) != nrow(qmatrix)) {
+    stop("Mj matrix has to coincide with items in the Qmatrix.")
+  }
+
+  # ================================================================
+
   if (rule == "1PLCDM") {
     design_matrix <- design_matrix_1plcdm(qmatrix)
   } else {
@@ -57,7 +69,8 @@ create_base_design_matrix <- function(
       qmatrix,
       rule,
       group = group,
-      group_invariance = group_invariance
+      group_invariance = group_invariance,
+      Mj = Mj
     )
 
     # ================================================================

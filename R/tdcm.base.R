@@ -18,7 +18,8 @@ tdcm.base <- function(
   rule,
   skillclasses = NULL,
   group = NULL,
-  group_invariance = TRUE
+  group_invariance = TRUE,
+  Mj = NULL
 ) {
   tdcm.1 <- suppressWarnings(CDM::gdina(
     data,
@@ -31,7 +32,8 @@ tdcm.base <- function(
     maxit = 1, # We just want the base constructions
     skillclasses = skillclasses,
     group = group,
-    invariance = group_invariance
+    invariance = group_invariance,
+    Mj = Mj
   )) # tdcm.1
   return(tdcm.1)
 } # tdcm.base

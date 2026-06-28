@@ -25,7 +25,8 @@ design_matrix_TDCM <- function(
   anchors = NULL,
   rule = "GDINA",
   group = NULL,
-  group_invariance = TRUE
+  group_invariance = TRUE,
+  Mj = NULL
 ) {
   # ======================================================
   # COMPLETE QMATRIX
@@ -45,7 +46,8 @@ design_matrix_TDCM <- function(
       qmatrix_list[[1]],
       rule = rule,
       group = group,
-      group_invariance = group_invariance
+      group_invariance = group_invariance,
+      Mj = Mj
     )
 
     design_matrix_list <- replicate(
@@ -69,7 +71,8 @@ design_matrix_TDCM <- function(
     qnew,
     rule = rule,
     group = group,
-    group_invariance = group_invariance
+    group_invariance = group_invariance,
+    Mj = Mj
   )
 
 
@@ -93,7 +96,8 @@ design_matrix_TDCM <- function(
     qnew,
     rule,
     group = groups,
-    group_invariance = group_invariance
+    group_invariance = group_invariance,
+    Mj = Mj
   )$coef
 
   # The anchoring matrix established the anchor pairs
